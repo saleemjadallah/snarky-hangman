@@ -4,7 +4,7 @@ import { GameBoard } from "@/components/GameBoard";
 import { DifficultySelector } from "@/components/DifficultySelector";
 import { words, type Difficulty, type Word } from "@/lib/game-data";
 import { Button } from "@/components/ui/button";
-import { Rotate } from "lucide-react";
+import { RotateCw } from "lucide-react";
 
 const getRandomWord = (difficulty: Difficulty): Word => {
   const filteredWords = words.filter((word) => word.difficulty === difficulty);
@@ -55,7 +55,7 @@ const Index = () => {
             className="btn-hover"
             size="lg"
           >
-            <Rotate className="mr-2 h-4 w-4" />
+            <RotateCw className="mr-2 h-4 w-4" />
             Play Again
           </Button>
         </div>
