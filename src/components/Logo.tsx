@@ -1,5 +1,6 @@
 
 import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
 
 interface LogoProps {
   className?: string;
@@ -12,7 +13,10 @@ export const Logo = ({ className, variant = "dark" }: LogoProps) => {
     : { primary: "#1A1F2C", secondary: "#9b87f5" };
 
   return (
-    <div className={cn("inline-flex items-center gap-2", className)}>
+    <Link 
+      to="/"
+      className={cn("inline-flex items-center gap-2 transition-opacity hover:opacity-80", className)}
+    >
       <svg
         width="32"
         height="32"
@@ -59,6 +63,6 @@ export const Logo = ({ className, variant = "dark" }: LogoProps) => {
       >
         Hangman
       </span>
-    </div>
+    </Link>
   );
 };
