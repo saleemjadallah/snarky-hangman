@@ -16,6 +16,10 @@ export const Logo = ({ className, variant = "dark" }: LogoProps) => {
     <Link 
       to="/"
       className={cn("inline-flex items-center gap-2 transition-opacity hover:opacity-80", className)}
+      onClick={(e) => {
+        e.preventDefault();
+        window.location.href = '/';
+      }}
     >
       <svg
         width="32"
