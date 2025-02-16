@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface LeaderboardEntry {
+  id: string;  // Added this property to fix the TypeScript error
   username: string;
   total_score: number;
   best_score: number;
