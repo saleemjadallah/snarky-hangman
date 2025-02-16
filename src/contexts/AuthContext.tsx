@@ -25,6 +25,13 @@ interface Profile {
   easy_games_played: number;
   medium_games_played: number;
   hard_games_played: number;
+  current_streak: number;
+  longest_streak: number;
+  perfect_games: number;
+  hints_used: number;
+  favorite_difficulty: string | null;
+  weekly_score: number;
+  daily_score: number;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

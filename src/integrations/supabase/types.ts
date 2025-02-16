@@ -9,50 +9,159 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          description: string | null
+          earned_at: string | null
+          id: string
+          score_multiplier: number | null
+          type: Database["public"]["Enums"]["achievement_type"]
+          user_id: string | null
+        }
+        Insert: {
+          description?: string | null
+          earned_at?: string | null
+          id?: string
+          score_multiplier?: number | null
+          type: Database["public"]["Enums"]["achievement_type"]
+          user_id?: string | null
+        }
+        Update: {
+          description?: string | null
+          earned_at?: string | null
+          id?: string
+          score_multiplier?: number | null
+          type?: Database["public"]["Enums"]["achievement_type"]
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      game_sessions: {
+        Row: {
+          abandoned: boolean | null
+          completion_time: number | null
+          created_at: string | null
+          difficulty: string
+          hints_used: number | null
+          id: string
+          perfect_game: boolean | null
+          score: number
+          user_id: string | null
+          word_category: string
+          wrong_guesses: number | null
+        }
+        Insert: {
+          abandoned?: boolean | null
+          completion_time?: number | null
+          created_at?: string | null
+          difficulty: string
+          hints_used?: number | null
+          id?: string
+          perfect_game?: boolean | null
+          score: number
+          user_id?: string | null
+          word_category: string
+          wrong_guesses?: number | null
+        }
+        Update: {
+          abandoned?: boolean | null
+          completion_time?: number | null
+          created_at?: string | null
+          difficulty?: string
+          hints_used?: number | null
+          id?: string
+          perfect_game?: boolean | null
+          score?: number
+          user_id?: string | null
+          word_category?: string
+          wrong_guesses?: number | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           best_score: number | null
           created_at: string | null
+          current_streak: number | null
+          daily_score: number | null
           easy_games_played: number | null
           email: string
+          favorite_difficulty: string | null
           hard_games_played: number | null
+          hints_used: number | null
           id: string
           last_played_at: string | null
+          last_streak_update: string | null
+          longest_streak: number | null
           medium_games_played: number | null
+          perfect_games: number | null
           total_score: number | null
           updated_at: string | null
           username: string
+          weekly_score: number | null
         }
         Insert: {
           best_score?: number | null
           created_at?: string | null
+          current_streak?: number | null
+          daily_score?: number | null
           easy_games_played?: number | null
           email: string
+          favorite_difficulty?: string | null
           hard_games_played?: number | null
+          hints_used?: number | null
           id: string
           last_played_at?: string | null
+          last_streak_update?: string | null
+          longest_streak?: number | null
           medium_games_played?: number | null
+          perfect_games?: number | null
           total_score?: number | null
           updated_at?: string | null
           username: string
+          weekly_score?: number | null
         }
         Update: {
           best_score?: number | null
           created_at?: string | null
+          current_streak?: number | null
+          daily_score?: number | null
           easy_games_played?: number | null
           email?: string
+          favorite_difficulty?: string | null
           hard_games_played?: number | null
+          hints_used?: number | null
           id?: string
           last_played_at?: string | null
+          last_streak_update?: string | null
+          longest_streak?: number | null
           medium_games_played?: number | null
+          perfect_games?: number | null
           total_score?: number | null
           updated_at?: string | null
           username?: string
+          weekly_score?: number | null
         }
         Relationships: []
       }
     }
     Views: {
+      global_rankings: {
+        Row: {
+          avg_score_per_game: number | null
+          best_score: number | null
+          current_streak: number | null
+          favorite_difficulty: string | null
+          global_rank: number | null
+          id: string | null
+          longest_streak: number | null
+          perfect_games: number | null
+          total_games: number | null
+          total_score: number | null
+          username: string | null
+        }
+        Relationships: []
+      }
       profile_stats: {
         Row: {
           best_score: number | null
@@ -91,7 +200,13 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      achievement_type:
+        | "PERFECT_GAME"
+        | "SPEED_DEMON"
+        | "STREAK_MASTER"
+        | "WEEKLY_CHAMPION"
+        | "DAILY_LEADER"
+        | "DIFFICULTY_MASTER"
     }
     CompositeTypes: {
       [_ in never]: never

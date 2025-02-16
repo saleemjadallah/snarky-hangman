@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { GameBoard } from "@/components/GameBoard";
 import { DifficultySelector } from "@/components/DifficultySelector";
@@ -8,6 +9,7 @@ import { Logo } from "@/components/Logo";
 import { RegistrationModal } from "@/components/RegistrationModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { ProfileMenu } from "@/components/ProfileMenu";
+import { Leaderboard } from "@/components/Leaderboard";
 
 const getRandomWord = (difficulty: Difficulty): Word => {
   const filteredWords = words.filter((word) => word.difficulty === difficulty);
@@ -55,6 +57,7 @@ const Index = () => {
       
       {(user || isGuest) && (
         <div className="absolute top-4 right-4 flex items-center gap-4">
+          {user && <Leaderboard />}
           <span className="text-sm font-medium">
             {isGuest ? `Playing as guest: ${displayName}` : `Welcome, ${displayName}!`}
           </span>
@@ -119,6 +122,6 @@ const Index = () => {
       />
     </div>
   );
-};
+}
 
 export default Index;
