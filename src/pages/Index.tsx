@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { GameBoard } from "@/components/GameBoard";
 import { DifficultySelector } from "@/components/DifficultySelector";
@@ -8,6 +7,7 @@ import { RotateCw, LogOut } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { RegistrationModal } from "@/components/RegistrationModal";
 import { useAuth } from "@/contexts/AuthContext";
+import { ProfileMenu } from "@/components/ProfileMenu";
 
 const getRandomWord = (difficulty: Difficulty): Word => {
   const filteredWords = words.filter((word) => word.difficulty === difficulty);
@@ -22,7 +22,6 @@ const Index = () => {
   const { user, profile, isGuest, guestName, signOut } = useAuth();
 
   useEffect(() => {
-    // Show registration modal if user is not logged in and not a guest
     if (!user && !isGuest) {
       setShowRegistration(true);
     }
@@ -59,7 +58,9 @@ const Index = () => {
           <span className="text-sm font-medium">
             {isGuest ? `Playing as guest: ${displayName}` : `Welcome, ${displayName}!`}
           </span>
-          {user && (
+          {user ? (
+            <ProfileMenu />
+          ) : (
             <Button variant="ghost" size="sm" onClick={signOut}>
               <LogOut className="h-4 w-4 mr-2" />
               Sign Out

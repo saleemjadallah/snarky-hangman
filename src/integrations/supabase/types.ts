@@ -11,31 +11,40 @@ export type Database = {
     Tables: {
       profiles: {
         Row: {
+          best_score: number | null
           created_at: string | null
+          easy_games_played: number | null
           email: string
-          games_played: number | null
+          hard_games_played: number | null
           id: string
           last_played_at: string | null
+          medium_games_played: number | null
           total_score: number | null
           updated_at: string | null
           username: string
         }
         Insert: {
+          best_score?: number | null
           created_at?: string | null
+          easy_games_played?: number | null
           email: string
-          games_played?: number | null
+          hard_games_played?: number | null
           id: string
           last_played_at?: string | null
+          medium_games_played?: number | null
           total_score?: number | null
           updated_at?: string | null
           username: string
         }
         Update: {
+          best_score?: number | null
           created_at?: string | null
+          easy_games_played?: number | null
           email?: string
-          games_played?: number | null
+          hard_games_played?: number | null
           id?: string
           last_played_at?: string | null
+          medium_games_played?: number | null
           total_score?: number | null
           updated_at?: string | null
           username?: string
@@ -44,7 +53,39 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      profile_stats: {
+        Row: {
+          best_score: number | null
+          easy_games_played: number | null
+          hard_games_played: number | null
+          id: string | null
+          last_played_at: string | null
+          medium_games_played: number | null
+          total_games_played: number | null
+          total_score: number | null
+        }
+        Insert: {
+          best_score?: never
+          easy_games_played?: number | null
+          hard_games_played?: number | null
+          id?: string | null
+          last_played_at?: string | null
+          medium_games_played?: number | null
+          total_games_played?: never
+          total_score?: never
+        }
+        Update: {
+          best_score?: never
+          easy_games_played?: number | null
+          hard_games_played?: number | null
+          id?: string | null
+          last_played_at?: string | null
+          medium_games_played?: number | null
+          total_games_played?: never
+          total_score?: never
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never

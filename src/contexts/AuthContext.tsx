@@ -1,8 +1,7 @@
-
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 interface AuthContextType {
   user: User | null;
@@ -19,9 +18,12 @@ interface AuthContextType {
 interface Profile {
   username: string;
   email: string;
-  games_played: number;
   total_score: number;
+  best_score: number;
   last_played_at: string | null;
+  easy_games_played: number;
+  medium_games_played: number;
+  hard_games_played: number;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
