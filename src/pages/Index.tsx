@@ -1,11 +1,13 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { GameBoard } from "@/components/GameBoard";
 import { DifficultySelector } from "@/components/DifficultySelector";
 import { words, type Difficulty, type Word } from "@/lib/game-data";
 import { Button } from "@/components/ui/button";
-import { RotateCw } from "lucide-react";
+import { RotateCw, LogOut } from "lucide-react";
 import { Logo } from "@/components/Logo";
+import { RegistrationModal } from "@/components/RegistrationModal";
+import { useAuth } from "@/contexts/AuthContext";
 
 const getRandomWord = (difficulty: Difficulty): Word => {
   const filteredWords = words.filter((word) => word.difficulty === difficulty);
@@ -16,6 +18,15 @@ const Index = () => {
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
   const [score, setScore] = useState(0);
+  const [showRegistration, setShowRegistration] = useState(false);
+  const { user, profile, isGuest, guestName, signOut } = useAuth();
+
+  useEffect(() => {
+    // Show registration modal if user is not logged in and not a guest
+    if (!user && !isGuest) {
+      setShowRegistration(true);
+    }
+  }, [user, isGuest]);
 
   const handleDifficultySelect = (selectedDifficulty: Difficulty) => {
     setDifficulty(selectedDifficulty);
@@ -35,11 +46,27 @@ const Index = () => {
     }
   };
 
+  const displayName = profile?.username || guestName || "Player";
+
   return (
     <div className="min-h-screen w-full">
       <div className="absolute top-4 left-4">
         <Logo />
       </div>
+      
+      {(user || isGuest) && (
+        <div className="absolute top-4 right-4 flex items-center gap-4">
+          <span className="text-sm font-medium">
+            {isGuest ? `Playing as guest: ${displayName}` : `Welcome, ${displayName}!`}
+          </span>
+          {user && (
+            <Button variant="ghost" size="sm" onClick={signOut}>
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
+            </Button>
+          )}
+        </div>
+      )}
       
       <div className="px-4 py-8 space-y-8">
         <div className="text-center space-y-4 mb-8">
@@ -84,6 +111,11 @@ const Index = () => {
           />
         )}
       </div>
+
+      <RegistrationModal
+        isOpen={showRegistration}
+        onClose={() => setShowRegistration(false)}
+      />
     </div>
   );
 };
