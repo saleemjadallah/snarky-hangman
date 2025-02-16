@@ -67,8 +67,12 @@ export function Leaderboard() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <button className="relative inline-flex items-center justify-center p-2 text-sm font-medium transition-all hover:scale-110">
-          <Trophy className="h-6 w-6 text-primary" />
+        <button 
+          className="relative inline-flex items-center justify-center p-2 text-sm font-medium transition-all hover:scale-110 rounded-full hover:bg-muted"
+          aria-label="Open Leaderboard"
+        >
+          <Trophy className="h-6 w-6 text-primary" aria-hidden="true" />
+          <span className="sr-only">Leaderboard</span>
           {userRank && (
             <Badge variant="secondary" className="absolute -top-2 -right-2">
               #{userRank.global_rank}
