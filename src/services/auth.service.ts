@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Profile } from "@/types/auth";
 import { Database } from "@/integrations/supabase/types";
@@ -13,6 +12,15 @@ type TestSessionResponse = {
   email: string;
 };
 
+async function waitForSession(maxAttempts = 5): Promise<boolean> {
+  for (let i = 0; i < maxAttempts; i++) {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) return true;
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second between attempts
+  }
+  return false;
+}
+
 export async function signUp(email: string, username: string) {
   // First create the test session with just email
   const { data: sessionData, error: sessionError } = await supabase.rpc(
@@ -26,8 +34,8 @@ export async function signUp(email: string, username: string) {
   const typedSessionData = sessionData as TestSessionResponse;
   console.log("Test session created:", typedSessionData);
 
-  // Wait for the database trigger to complete
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  // Wait longer for the database trigger and session establishment
+  await new Promise(resolve => setTimeout(resolve, 2000));
 
   // Update the username in profiles table
   const { error: updateError } = await supabase
@@ -37,17 +45,16 @@ export async function signUp(email: string, username: string) {
 
   if (updateError) throw updateError;
 
-  // Get the session
+  // Wait for session to be established
+  const sessionEstablished = await waitForSession();
+  if (!sessionEstablished) throw new Error('Failed to establish session after multiple attempts');
+
+  // Get the final session state
   const { data: { session }, error: getSessionError } = await supabase.auth.getSession();
   if (getSessionError) throw getSessionError;
   if (!session) throw new Error('Session not established');
 
-  // Force refresh the session to ensure it's properly established
-  const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
-  if (refreshError) throw refreshError;
-  if (!refreshData.session) throw new Error('Failed to refresh session');
-
-  return { session: refreshData.session };
+  return { session };
 }
 
 export async function signIn(email: string) {
@@ -63,20 +70,19 @@ export async function signIn(email: string) {
   const typedSessionData = sessionData as TestSessionResponse;
   console.log("Test session created:", typedSessionData);
 
-  // Wait for the database trigger to complete
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  // Wait longer for the database trigger and session establishment
+  await new Promise(resolve => setTimeout(resolve, 2000));
 
-  // Get the session
+  // Wait for session to be established
+  const sessionEstablished = await waitForSession();
+  if (!sessionEstablished) throw new Error('Failed to establish session after multiple attempts');
+
+  // Get the final session state
   const { data: { session }, error: getSessionError } = await supabase.auth.getSession();
   if (getSessionError) throw getSessionError;
   if (!session) throw new Error('Session not established');
 
-  // Force refresh the session to ensure it's properly established
-  const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
-  if (refreshError) throw refreshError;
-  if (!refreshData.session) throw new Error('Failed to refresh session');
-
-  return { session: refreshData.session };
+  return { session };
 }
 
 export async function fetchProfile(userId: string): Promise<Profile | null> {
