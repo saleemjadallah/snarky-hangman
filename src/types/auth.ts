@@ -2,6 +2,7 @@
 import { User } from "@supabase/supabase-js";
 
 export interface Profile {
+  id: string;
   username: string;
   email: string;
   total_score: number;
