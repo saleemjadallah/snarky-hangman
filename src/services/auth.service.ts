@@ -44,11 +44,12 @@ export async function createTestSession(email: string) {
   
   if (error) throw error;
   
-  // After creating the session, explicitly sign in the user
-  return await supabase.auth.signInWithPassword({
+  // Wait a moment for the user to be created
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  // Instead of password sign in, we'll use a magic link
+  return await supabase.auth.signInWithOtp({
     email: email,
-    // Use a known password for test sessions
-    password: 'test-session-password'
   });
 }
 
