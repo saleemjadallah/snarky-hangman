@@ -23,23 +23,16 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
 
   const isValidUsername = username.length >= 2 && username.length <= 30;
   const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const canSubmit = isValidUsername && isValidEmail && !isLoading;
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!canSubmit) return;
+    if (!isValidUsername || !isValidEmail || isLoading) return;
 
     setIsLoading(true);
     try {
       await signUp(email, username);
       onClose();
-    } catch (error: any) {
-      toast({
-        title: "Signup failed",
-        description: error.message || "Something went wrong",
-        variant: "destructive",
-      });
-    } finally {
+    } catch (error) {
       setIsLoading(false);
     }
   };
@@ -52,13 +45,7 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
     try {
       await signIn(email);
       onClose();
-    } catch (error: any) {
-      toast({
-        title: "Sign in failed",
-        description: error.message || "Something went wrong",
-        variant: "destructive",
-      });
-    } finally {
+    } catch (error) {
       setIsLoading(false);
     }
   };
@@ -76,7 +63,7 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-center">Welcome to Snarky Hangman!</DialogTitle>
           <DialogDescription className="text-center pt-2">
-            Just two quick things and you'll be ready to challenge our snarky AI!
+            Sign up or sign in to start playing!
           </DialogDescription>
         </DialogHeader>
         
@@ -89,47 +76,46 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
           <TabsContent value="signup">
             <form onSubmit={handleSignUp} className="space-y-6 pt-4">
               <div className="space-y-2">
-                <Label htmlFor="username">What should we call you?</Label>
+                <Label htmlFor="username">Username</Label>
                 <Input
                   id="username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Your nickname"
+                  placeholder="Enter your username"
                   className="w-full"
                   disabled={isLoading}
                 />
                 {username && !isValidUsername && (
                   <p className="text-sm text-red-500">
-                    Names need to be 2-30 characters long (we can't just call you '{username}'!)
+                    Username must be between 2 and 30 characters
                   </p>
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="signup-email">Your email address</Label>
+                <Label htmlFor="signup-email">Email</Label>
                 <Input
                   id="signup-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Where can we reach you?"
+                  placeholder="Enter your email"
                   className="w-full"
                   disabled={isLoading}
                 />
-                {email && !isValidEmail && (
-                  <p className="text-sm text-red-500">
-                    Oops! That email doesn't look quite right
-                  </p>
-                )}
               </div>
               <div className="space-y-4">
-                <Button type="submit" className="w-full" disabled={!canSubmit}>
+                <Button 
+                  type="submit" 
+                  className="w-full"
+                  disabled={!isValidUsername || !isValidEmail || isLoading}
+                >
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Creating account...
                     </>
                   ) : (
-                    "Start Playing!"
+                    "Sign Up"
                   )}
                 </Button>
                 <Button
@@ -139,7 +125,7 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
                   onClick={playAsGuest}
                   disabled={!isValidUsername || isLoading}
                 >
-                  Just play as guest
+                  Play as guest
                 </Button>
               </div>
             </form>
@@ -148,27 +134,26 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
           <TabsContent value="signin">
             <form onSubmit={handleSignIn} className="space-y-6 pt-4">
               <div className="space-y-2">
-                <Label htmlFor="signin-email">Your email address</Label>
+                <Label htmlFor="signin-email">Email</Label>
                 <Input
                   id="signin-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email to sign in"
+                  placeholder="Enter your email"
                   className="w-full"
                   disabled={isLoading}
                 />
-                {email && !isValidEmail && (
-                  <p className="text-sm text-red-500">
-                    Please enter a valid email address
-                  </p>
-                )}
               </div>
-              <Button type="submit" className="w-full" disabled={!isValidEmail || isLoading}>
+              <Button 
+                type="submit" 
+                className="w-full"
+                disabled={!isValidEmail || isLoading}
+              >
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Signing you in...
+                    Signing in...
                   </>
                 ) : (
                   "Sign In"
@@ -177,10 +162,6 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
             </form>
           </TabsContent>
         </Tabs>
-
-        <p className="text-sm text-muted-foreground italic text-center">
-          We'll only use your email to save your progress and amazing victories (or hilarious defeats). No spam, promise! 😉
-        </p>
       </DialogContent>
     </Dialog>
   );

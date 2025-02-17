@@ -14,46 +14,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [guestName, setGuestName] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const fetchProfile = async (userId: string) => {
-    try {
-      const data = await AuthService.fetchProfile(userId);
-      if (data) {
-        console.log("Profile fetched:", data);
-        setProfile(data);
-      }
-    } catch (error: any) {
-      console.error('Error fetching profile:', error);
-      toast({
-        title: "Error fetching profile",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
-
   useEffect(() => {
-    // Initial session check
-    AuthService.getCurrentSession().then(({ data: { session } }) => {
-      console.log("Initial session check:", session);
+    // Check initial session
+    AuthService.getCurrentSession().then(({ data: { session }}) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        fetchProfile(session.user.id);
+        AuthService.fetchProfile(session.user.id)
+          .then(profile => setProfile(profile));
       }
       setIsLoading(false);
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = AuthService.onAuthStateChange(async (session) => {
-      console.log("Auth state changed:", session);
-      
+    const { data: { subscription }} = AuthService.onAuthStateChange((session) => {
+      setUser(session?.user ?? null);
       if (session?.user) {
-        setUser(session.user);
-        await fetchProfile(session.user.id);
+        AuthService.fetchProfile(session.user.id)
+          .then(profile => setProfile(profile));
       } else {
-        setUser(null);
         setProfile(null);
       }
-      
       setIsLoading(false);
     });
 
@@ -63,25 +43,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signUp = async (email: string, username: string) => {
     setIsLoading(true);
     try {
-      const isUsernameAvailable = await AuthService.checkUsernameAvailability(username);
-      if (!isUsernameAvailable) {
-        throw new Error("Username already taken");
-      }
-
-      const { data, error } = await AuthService.createTestSession(email);
-      if (error) throw error;
-
-      if (!data.session?.user) {
-        throw new Error("Failed to create user session");
-      }
-
-      await AuthService.updateUsername(data.session.user.id, username);
-      setUser(data.session.user);
-      await fetchProfile(data.session.user.id);
+      const { session } = await AuthService.signUp(email, username);
+      if (!session) throw new Error("Failed to create session");
+      
+      setUser(session.user);
+      const profile = await AuthService.fetchProfile(session.user.id);
+      setProfile(profile);
 
       toast({
-        title: "Welcome aboard!",
-        description: "You're now signed in and ready to play!",
+        title: "Welcome!",
+        description: "Your account has been created successfully.",
       });
     } catch (error: any) {
       console.error("Signup error:", error);
@@ -99,19 +70,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signIn = async (email: string) => {
     setIsLoading(true);
     try {
-      const { data, error } = await AuthService.createTestSession(email);
-      if (error) throw error;
+      const { session } = await AuthService.signIn(email);
+      if (!session) throw new Error("Failed to create session");
 
-      if (!data.session?.user) {
-        throw new Error("Failed to create user session");
-      }
+      setUser(session.user);
+      const profile = await AuthService.fetchProfile(session.user.id);
+      setProfile(profile);
 
-      setUser(data.session.user);
-      await fetchProfile(data.session.user.id);
-      
       toast({
         title: "Welcome back!",
-        description: "You're now signed in and ready to play!",
+        description: "You've been signed in successfully.",
       });
     } catch (error: any) {
       console.error("Sign in error:", error);
@@ -127,45 +95,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
-    setIsLoading(true);
     try {
-      const { error } = await AuthService.signOutUser();
-      if (error) throw error;
-      setGuestName(null);
+      await AuthService.signOut();
       setUser(null);
       setProfile(null);
+      setGuestName(null);
+      toast({
+        title: "Signed out",
+        description: "You've been signed out successfully.",
+      });
     } catch (error: any) {
       toast({
         title: "Error signing out",
         description: error.message,
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  const contextValue = {
-    user,
-    profile,
-    isLoading,
-    signUp,
-    signIn,
-    signOut,
-    setGuestName,
-    isGuest: !user && !!guestName,
-    guestName
-  };
-
-  console.log("Auth context state:", {
-    user: !!user,
-    profile: !!profile,
-    isLoading,
-    isGuest: !user && !!guestName
-  });
-
   return (
-    <AuthContext.Provider value={contextValue}>
+    <AuthContext.Provider value={{
+      user,
+      profile,
+      isLoading,
+      signUp,
+      signIn,
+      signOut,
+      setGuestName,
+      isGuest: !user && !!guestName,
+      guestName
+    }}>
       {children}
     </AuthContext.Provider>
   );
