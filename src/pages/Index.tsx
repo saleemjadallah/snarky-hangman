@@ -1,8 +1,7 @@
-
 import { useState, useEffect } from "react";
 import { GameBoard } from "@/components/GameBoard";
 import { DifficultySelector } from "@/components/DifficultySelector";
-import { words, type Difficulty, type Word } from "@/lib/game-data";
+import { type Difficulty, type Word } from "@/lib/game-data";
 import { Button } from "@/components/ui/button";
 import { RotateCw, LogOut } from "lucide-react";
 import { Logo } from "@/components/Logo";
@@ -10,11 +9,8 @@ import { RegistrationModal } from "@/components/RegistrationModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { ProfileMenu } from "@/components/ProfileMenu";
 import { Leaderboard } from "@/components/Leaderboard";
-
-const getRandomWord = (difficulty: Difficulty): Word => {
-  const filteredWords = words.filter((word) => word.difficulty === difficulty);
-  return filteredWords[Math.floor(Math.random() * filteredWords.length)];
-};
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
@@ -22,6 +18,7 @@ const Index = () => {
   const [score, setScore] = useState(0);
   const [showRegistration, setShowRegistration] = useState(false);
   const { user, profile, isGuest, guestName, signOut } = useAuth();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!user && !isGuest) {
@@ -29,21 +26,65 @@ const Index = () => {
     }
   }, [user, isGuest]);
 
-  const handleDifficultySelect = (selectedDifficulty: Difficulty) => {
-    setDifficulty(selectedDifficulty);
-    setCurrentWord(getRandomWord(selectedDifficulty));
+  const getRandomWord = async (difficulty: Difficulty) => {
+    try {
+      const categories = ['animals', 'science', 'arts', 'sports', 'food', 'geography', 'business', 'health'];
+      const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+
+      await supabase.functions.invoke('generate-words', {
+        body: { difficulty, category: randomCategory }
+      });
+
+      const { data: words, error } = await supabase
+        .from('word_pool')
+        .select('word, difficulty, category')
+        .eq('difficulty', difficulty)
+        .eq('category', randomCategory)
+        .eq('active', true)
+        .order('times_used', { ascending: true })
+        .limit(1);
+
+      if (error) {
+        throw error;
+      }
+
+      if (!words || words.length === 0) {
+        throw new Error('No words available');
+      }
+
+      return words[0] as Word;
+    } catch (error) {
+      console.error('Error fetching word:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch a word. Please try again.",
+        variant: "destructive"
+      });
+      return null;
+    }
   };
 
-  const handleGameEnd = (won: boolean, gameScore: number) => {
+  const handleDifficultySelect = async (selectedDifficulty: Difficulty) => {
+    setDifficulty(selectedDifficulty);
+    const word = await getRandomWord(selectedDifficulty);
+    if (word) {
+      setCurrentWord(word);
+    }
+  };
+
+  const handleGameEnd = async (won: boolean, gameScore: number) => {
     if (won) {
       setScore((prev) => prev + gameScore);
     }
     setCurrentWord(null);
   };
 
-  const handlePlayAgain = () => {
+  const handlePlayAgain = async () => {
     if (difficulty) {
-      setCurrentWord(getRandomWord(difficulty));
+      const word = await getRandomWord(difficulty);
+      if (word) {
+        setCurrentWord(word);
+      }
     }
   };
 

@@ -1,25 +1,12 @@
-
 export type Difficulty = 'easy' | 'medium' | 'hard';
 
-export type Category = 'animals' | 'movies' | 'technology';
+export type Category = 'animals' | 'science' | 'arts' | 'sports' | 'food' | 'geography' | 'business' | 'health';
 
 export interface Word {
   word: string;
   category: Category;
   difficulty: Difficulty;
 }
-
-export const words: Word[] = [
-  { word: "CAT", category: "animals", difficulty: "easy" },
-  { word: "DOG", category: "animals", difficulty: "easy" },
-  { word: "LION", category: "animals", difficulty: "easy" },
-  { word: "AVATAR", category: "movies", difficulty: "medium" },
-  { word: "MATRIX", category: "movies", difficulty: "medium" },
-  { word: "INCEPTION", category: "movies", difficulty: "hard" },
-  { word: "LAPTOP", category: "technology", difficulty: "easy" },
-  { word: "JAVASCRIPT", category: "technology", difficulty: "hard" },
-  { word: "ALGORITHM", category: "technology", difficulty: "hard" },
-];
 
 export const snarkyComments = {
   goodGuess: [
