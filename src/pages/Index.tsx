@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { GameBoard } from "@/components/GameBoard";
 import { DifficultySelector } from "@/components/DifficultySelector";
@@ -96,22 +97,22 @@ const Index = () => {
         <Logo />
       </div>
       
-      {(user || isGuest) && (
-        <div className="absolute top-4 right-4 flex items-center gap-4">
-          {user && <Leaderboard />}
-          <span className="text-sm font-medium">
-            {isGuest ? `Playing as guest: ${displayName}` : `Welcome, ${displayName}!`}
-          </span>
-          {user ? (
-            <ProfileMenu />
-          ) : (
+      <div className="absolute top-4 right-4 flex items-center gap-4">
+        {user && <Leaderboard />}
+        {user ? (
+          <ProfileMenu />
+        ) : isGuest ? (
+          <>
+            <span className="text-sm font-medium">
+              Playing as guest: {displayName}
+            </span>
             <Button variant="ghost" size="sm" onClick={signOut}>
               <LogOut className="h-4 w-4 mr-2" />
               Sign Out
             </Button>
-          )}
-        </div>
-      )}
+          </>
+        ) : null}
+      </div>
       
       <div className="px-4 py-8 space-y-8">
         <div className="text-center space-y-4 mb-8">
@@ -163,6 +164,7 @@ const Index = () => {
       />
     </div>
   );
-}
+};
 
 export default Index;
+
