@@ -2,38 +2,16 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Difficulty, Word, snarkyComments, difficultySettings } from "@/lib/game-data";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { MessageCircle } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { Avatar } from "./avatar/Avatar";
+import { WordDisplay } from "./game/WordDisplay";
+import { GameStatus } from "./game/GameStatus";
+import { LetterGrid } from "./game/LetterGrid";
 
 interface GameBoardProps {
   currentWord: Word;
   difficulty: Difficulty;
   onGameEnd: (won: boolean, score: number) => void;
 }
-
-interface WordCache {
-  easy?: Word[];
-  medium?: Word[];
-  hard?: Word[];
-}
-
-const CACHE_KEY = 'word_cache';
-const MIN_CACHE_THRESHOLD = 5;
-
-const getWordCache = (): WordCache => {
-  try {
-    return JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
-  } catch {
-    return {};
-  }
-};
-
-const setWordCache = (cache: WordCache) => {
-  localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
-};
 
 export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps) => {
   const [guessedLetters, setGuessedLetters] = useState<string[]>([]);
@@ -49,7 +27,6 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
   const gameWon = word.split("").every((letter) => guessedLetters.includes(letter));
 
   useEffect(() => {
-    // Reset state when a new word is received
     setGuessedLetters([]);
     setRemainingGuesses(difficultySettings[difficulty].maxGuesses);
     setMessage("");
@@ -63,7 +40,7 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
       
       setTimeout(() => {
         onGameEnd(gameWon, score);
-      }, 2000); // Give time for the avatar animation to play
+      }, 2000);
     }
   }, [isGameOver, isGameFinished]);
 
@@ -72,13 +49,6 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
     const wrongGuesses = guessed.filter(letter => !word.includes(letter)).length;
     const baseScore = uniqueLetters * difficultySettings[difficulty].pointsPerLetter;
     return Math.max(0, baseScore - (wrongGuesses * 5));
-  };
-
-  const maskWord = (word: string) => {
-    return word
-      .split("")
-      .map((letter) => (guessedLetters.includes(letter) ? letter : "_"))
-      .join(" ");
   };
 
   const handleGuess = (letter: string) => {
@@ -108,7 +78,6 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
       const comment = snarkyComments.goodGuess[Math.floor(Math.random() * snarkyComments.goodGuess.length)];
       setMessage(comment);
 
-      // Check if this guess wins the game
       if (word.split("").every(l => newGuessedLetters.includes(l))) {
         const winComment = snarkyComments.win[Math.floor(Math.random() * snarkyComments.win.length)];
         const score = calculateScore(newGuessedLetters, word);
@@ -122,51 +91,26 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
 
   return (
     <div className="w-full max-w-2xl mx-auto p-6 glass rounded-xl space-y-8">
-      <div className="space-y-4">
-        <Badge variant="outline" className="text-sm">
-          {category.charAt(0).toUpperCase() + category.slice(1)}
-        </Badge>
-        <div className="flex items-center justify-between gap-8">
-          <div className="text-4xl font-bold tracking-wider text-primary">
-            {maskWord(word)}
-          </div>
-          <Avatar
-            wrongGuesses={wrongGuesses}
-            maxGuesses={difficultySettings[difficulty].maxGuesses}
-            gameWon={gameWon}
-            isGameOver={isGameOver}
-            className="hidden md:block"
-          />
-        </div>
-      </div>
+      <WordDisplay
+        word={word}
+        category={category}
+        guessedLetters={guessedLetters}
+        wrongGuesses={wrongGuesses}
+        difficulty={difficulty}
+        gameWon={gameWon}
+        isGameOver={isGameOver}
+      />
 
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
-          Remaining Guesses: {remainingGuesses}
-        </div>
-        {message && (
-          <div className="flex items-center gap-2 text-sm text-primary">
-            <MessageCircle size={16} />
-            {message}
-          </div>
-        )}
-      </div>
+      <GameStatus
+        remainingGuesses={remainingGuesses}
+        message={message}
+      />
 
-      <div className="grid grid-cols-7 sm:grid-cols-9 gap-2">
-        {Array.from("ABCDEFGHIJKLMNOPQRSTUVWXYZ").map((letter) => (
-          <Button
-            key={letter}
-            variant={guessedLetters.includes(letter) ? "secondary" : "outline"}
-            className={`w-10 h-10 ${
-              guessedLetters.includes(letter) ? "opacity-50" : "btn-hover"
-            }`}
-            disabled={guessedLetters.includes(letter) || isGameOver}
-            onClick={() => handleGuess(letter)}
-          >
-            {letter}
-          </Button>
-        ))}
-      </div>
+      <LetterGrid
+        guessedLetters={guessedLetters}
+        isGameOver={isGameOver}
+        onGuess={handleGuess}
+      />
 
       <Avatar
         wrongGuesses={wrongGuesses}
