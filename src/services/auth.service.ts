@@ -32,8 +32,14 @@ export async function signUp(email: string, username: string) {
   // Get the session
   const { data: { session }, error: getSessionError } = await supabase.auth.getSession();
   if (getSessionError) throw getSessionError;
+  if (!session) throw new Error('Session not established');
 
-  return { session };
+  // Force refresh the session to ensure it's properly established
+  const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+  if (refreshError) throw refreshError;
+  if (!refreshData.session) throw new Error('Failed to refresh session');
+
+  return { session: refreshData.session };
 }
 
 export async function signIn(email: string) {
@@ -53,8 +59,14 @@ export async function signIn(email: string) {
   // Get the session
   const { data: { session }, error: getSessionError } = await supabase.auth.getSession();
   if (getSessionError) throw getSessionError;
+  if (!session) throw new Error('Session not established');
 
-  return { session };
+  // Force refresh the session to ensure it's properly established
+  const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+  if (refreshError) throw refreshError;
+  if (!refreshData.session) throw new Error('Failed to refresh session');
+
+  return { session: refreshData.session };
 }
 
 export async function fetchProfile(userId: string): Promise<Profile | null> {
