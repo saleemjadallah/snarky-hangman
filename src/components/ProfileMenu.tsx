@@ -5,6 +5,7 @@ import {
   DropdownMenuGroup,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "./UserAvatar";
@@ -12,11 +13,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { ProfileHeader } from "./profile/ProfileHeader";
 import { GameStatistics } from "./profile/GameStatistics";
 import { DeleteAccount } from "./profile/DeleteAccount";
+import { LogIn } from "lucide-react";
 
 export function ProfileMenu() {
-  const { user, profile, signOut } = useAuth();
-
-  if (!user || !profile) return null;
+  const { user, profile, signOut, isGuest, guestName } = useAuth();
 
   return (
     <DropdownMenu>
@@ -25,17 +25,44 @@ export function ProfileMenu() {
           variant="ghost"
           className="relative h-8 w-8 rounded-full transition-all hover:scale-110"
         >
-          <UserAvatar name={profile.username} />
+          <UserAvatar name={profile?.username || guestName || "Guest"} />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-80" align="end" forceMount>
-        <ProfileHeader profile={profile} />
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <GameStatistics profile={profile} />
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DeleteAccount userId={user.id} onDelete={signOut} />
+        {user && profile ? (
+          <>
+            <ProfileHeader profile={profile} />
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <GameStatistics profile={profile} />
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DeleteAccount userId={user.id} onDelete={signOut} />
+          </>
+        ) : (
+          <DropdownMenuItem className="flex flex-col space-y-4 p-4">
+            <div className="text-center">
+              <p className="text-sm font-medium mb-2">
+                {isGuest ? `Playing as ${guestName}` : "Welcome to Snarky Hangman!"}
+              </p>
+              <p className="text-xs text-muted-foreground mb-4">
+                {isGuest 
+                  ? "Sign in to save your progress and compete on the leaderboard"
+                  : "Sign in to track your progress and compete with others"}
+              </p>
+              {isGuest ? (
+                <Button variant="destructive" size="sm" onClick={signOut}>
+                  Sign Out
+                </Button>
+              ) : (
+                <Button variant="default" size="sm" onClick={() => window.location.reload()}>
+                  <LogIn className="mr-2 h-4 w-4" />
+                  Sign In
+                </Button>
+              )}
+            </div>
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
