@@ -243,7 +243,12 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      create_test_session: {
+        Args: {
+          user_email: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       achievement_type:

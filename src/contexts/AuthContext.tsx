@@ -109,26 +109,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error("Username already taken");
       }
 
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password: crypto.randomUUID(),
-        options: {
-          data: {
-            username,
-          },
-        },
+      // For testing: Use direct login instead of email verification
+      const { data, error: sessionError } = await supabase.rpc('create_test_session', {
+        user_email: email
       });
 
-      if (error) {
-        console.error("Signup error:", error);
-        throw error;
+      if (sessionError) {
+        console.error("Session creation error:", sessionError);
+        throw sessionError;
       }
 
-      console.log("Signup successful:", data);
+      console.log("Direct login successful:", data);
       
       toast({
         title: "Welcome aboard!",
-        description: "Check your email for the magic link to start playing!",
+        description: "You're now signed in and ready to play!",
       });
     } catch (error: any) {
       console.error("Signup process error:", error);
@@ -142,15 +137,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string) => {
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
+      // For testing: Use direct login instead of magic link
+      const { data, error } = await supabase.rpc('create_test_session', {
+        user_email: email
       });
 
       if (error) throw error;
       
       toast({
-        title: "Magic link sent!",
-        description: "Check your email to sign in and start playing!",
+        title: "Welcome back!",
+        description: "You're now signed in and ready to play!",
       });
     } catch (error: any) {
       toast({
