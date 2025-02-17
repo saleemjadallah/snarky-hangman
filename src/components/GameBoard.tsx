@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Difficulty, Word, snarkyComments, difficultySettings } from "@/lib/game-data";
@@ -6,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Avatar } from "./avatar/Avatar";
 
 interface GameBoardProps {
   currentWord: Word;
@@ -42,6 +42,9 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
 
   const word = currentWord.word.toUpperCase();
   const category = currentWord.category;
+  const wrongGuesses = difficultySettings[difficulty].maxGuesses - remainingGuesses;
+  const isGameOver = remainingGuesses === 0 || word.split("").every((letter) => guessedLetters.includes(letter));
+  const gameWon = word.split("").every((letter) => guessedLetters.includes(letter));
 
   useEffect(() => {
     const fetchWords = async () => {
@@ -112,8 +115,7 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
       const comment = snarkyComments.goodGuess[Math.floor(Math.random() * snarkyComments.goodGuess.length)];
       setMessage(comment);
 
-      const isWin = word.split("").every((letter) => newGuessedLetters.includes(letter));
-      if (isWin) {
+      if (gameWon) {
         const winComment = snarkyComments.win[Math.floor(Math.random() * snarkyComments.win.length)];
         const score = calculateScore(newGuessedLetters, word);
         toast({
@@ -149,8 +151,17 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
         <Badge variant="outline" className="text-sm">
           {category.charAt(0).toUpperCase() + category.slice(1)}
         </Badge>
-        <div className="text-4xl font-bold tracking-wider text-primary">
-          {maskWord(word)}
+        <div className="flex items-center justify-between gap-8">
+          <div className="text-4xl font-bold tracking-wider text-primary">
+            {maskWord(word)}
+          </div>
+          <Avatar
+            wrongGuesses={wrongGuesses}
+            maxGuesses={difficultySettings[difficulty].maxGuesses}
+            gameWon={gameWon}
+            isGameOver={isGameOver}
+            className="hidden md:block"
+          />
         </div>
       </div>
 
@@ -181,6 +192,14 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
           </Button>
         ))}
       </div>
+
+      <Avatar
+        wrongGuesses={wrongGuesses}
+        maxGuesses={difficultySettings[difficulty].maxGuesses}
+        gameWon={gameWon}
+        isGameOver={isGameOver}
+        className="md:hidden mt-4"
+      />
     </div>
   );
 };
