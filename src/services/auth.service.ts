@@ -1,88 +1,38 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { Profile } from "@/types/auth";
-import { Database } from "@/integrations/supabase/types";
-
-// Define the expected response type from create_test_session RPC
-type RPCResponse<T> = T extends keyof Database['public']['Functions'] 
-  ? Database['public']['Functions'][T]['Returns'] 
-  : never;
-
-type TestSessionResponse = {
-  user_id: string;
-  email: string;
-};
-
-async function waitForSession(maxAttempts = 5): Promise<boolean> {
-  for (let i = 0; i < maxAttempts; i++) {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) return true;
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second between attempts
-  }
-  return false;
-}
 
 export async function signUp(email: string, username: string) {
-  // First create the test session with just email
-  const { data: sessionData, error: sessionError } = await supabase.rpc(
-    'create_test_session',
-    { user_email: email }
-  );
-  
-  if (sessionError) throw sessionError;
-  if (!sessionData || typeof sessionData !== 'object') throw new Error('No session data returned');
-  
-  const typedSessionData = sessionData as TestSessionResponse;
-  console.log("Test session created:", typedSessionData);
+  // First create the actual user account
+  const { data: authData, error: signUpError } = await supabase.auth.signUp({
+    email,
+    password: email, // For demo purposes, using email as password. In production, you'd want a proper password field
+    options: {
+      data: {
+        username: username // Store username in user metadata
+      }
+    }
+  });
 
-  // Wait longer for the database trigger and session establishment
-  await new Promise(resolve => setTimeout(resolve, 2000));
+  if (signUpError) throw signUpError;
+  if (!authData.user) throw new Error('No user data returned');
 
-  // Update the username in profiles table
-  const { error: updateError } = await supabase
-    .from('profiles')
-    .update({ username })
-    .eq('id', typedSessionData.user_id);
+  // The profile will be created automatically by our database trigger
+  console.log("User created:", authData);
 
-  if (updateError) throw updateError;
-
-  // Wait for session to be established
-  const sessionEstablished = await waitForSession();
-  if (!sessionEstablished) throw new Error('Failed to establish session after multiple attempts');
-
-  // Get the final session state
-  const { data: { session }, error: getSessionError } = await supabase.auth.getSession();
-  if (getSessionError) throw getSessionError;
-  if (!session) throw new Error('Session not established');
-
-  return { session };
+  return { session: authData.session };
 }
 
 export async function signIn(email: string) {
-  // Create test session for existing user
-  const { data: sessionData, error: sessionError } = await supabase.rpc(
-    'create_test_session',
-    { user_email: email }
-  );
-  
-  if (sessionError) throw sessionError;
-  if (!sessionData || typeof sessionData !== 'object') throw new Error('No session data returned');
-  
-  const typedSessionData = sessionData as TestSessionResponse;
-  console.log("Test session created:", typedSessionData);
+  const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
+    email,
+    password: email // For demo purposes, using email as password
+  });
 
-  // Wait longer for the database trigger and session establishment
-  await new Promise(resolve => setTimeout(resolve, 2000));
+  if (signInError) throw signInError;
+  if (!authData.session) throw new Error('No session established');
 
-  // Wait for session to be established
-  const sessionEstablished = await waitForSession();
-  if (!sessionEstablished) throw new Error('Failed to establish session after multiple attempts');
-
-  // Get the final session state
-  const { data: { session }, error: getSessionError } = await supabase.auth.getSession();
-  if (getSessionError) throw getSessionError;
-  if (!session) throw new Error('Session not established');
-
-  return { session };
+  return { session: authData.session };
 }
 
 export async function fetchProfile(userId: string): Promise<Profile | null> {

@@ -31,8 +31,17 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
     setIsLoading(true);
     try {
       await signUp(email, username);
+      toast({
+        title: "Account created!",
+        description: "Please check your email to verify your account.",
+      });
       onClose();
-    } catch (error) {
+    } catch (error: any) {
+      toast({
+        title: "Error creating account",
+        description: error.message,
+        variant: "destructive",
+      });
       setIsLoading(false);
     }
   };
@@ -44,8 +53,17 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
     setIsLoading(true);
     try {
       await signIn(email);
+      toast({
+        title: "Welcome back!",
+        description: "You've been successfully signed in.",
+      });
       onClose();
-    } catch (error) {
+    } catch (error: any) {
+      toast({
+        title: "Error signing in",
+        description: error.message,
+        variant: "destructive",
+      });
       setIsLoading(false);
     }
   };
