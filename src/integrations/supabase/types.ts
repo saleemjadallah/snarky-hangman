@@ -144,6 +144,42 @@ export type Database = {
         }
         Relationships: []
       }
+      word_pool: {
+        Row: {
+          active: boolean | null
+          category: string
+          created_at: string | null
+          difficulty: string
+          id: string
+          last_used_at: string | null
+          success_rate: number | null
+          times_used: number | null
+          word: string
+        }
+        Insert: {
+          active?: boolean | null
+          category: string
+          created_at?: string | null
+          difficulty: string
+          id?: string
+          last_used_at?: string | null
+          success_rate?: number | null
+          times_used?: number | null
+          word: string
+        }
+        Update: {
+          active?: boolean | null
+          category?: string
+          created_at?: string | null
+          difficulty?: string
+          id?: string
+          last_used_at?: string | null
+          success_rate?: number | null
+          times_used?: number | null
+          word?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       global_rankings: {
@@ -192,6 +228,16 @@ export type Database = {
           medium_games_played?: number | null
           total_games_played?: never
           total_score?: never
+        }
+        Relationships: []
+      }
+      word_pool_stats: {
+        Row: {
+          active_words: number | null
+          avg_success_rate: number | null
+          category: string | null
+          difficulty: string | null
+          last_word_used: string | null
         }
         Relationships: []
       }
