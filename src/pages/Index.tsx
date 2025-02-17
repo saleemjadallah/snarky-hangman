@@ -1,9 +1,10 @@
+
 import { useState, useEffect } from "react";
 import { GameBoard } from "@/components/GameBoard";
 import { DifficultySelector } from "@/components/DifficultySelector";
 import { type Difficulty, type Word } from "@/lib/game-data";
 import { Button } from "@/components/ui/button";
-import { RotateCw, LogOut } from "lucide-react";
+import { RotateCw, LogOut, Loader2 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { RegistrationModal } from "@/components/RegistrationModal";
 import { useAuth } from "@/contexts/AuthContext";
@@ -17,6 +18,7 @@ const Index = () => {
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
   const [score, setScore] = useState(0);
   const [showRegistration, setShowRegistration] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { user, profile, isGuest, guestName, signOut } = useAuth();
   const { toast } = useToast();
 
@@ -66,7 +68,9 @@ const Index = () => {
 
   const handleDifficultySelect = async (selectedDifficulty: Difficulty) => {
     setDifficulty(selectedDifficulty);
+    setIsLoading(true);
     const word = await getRandomWord(selectedDifficulty);
+    setIsLoading(false);
     if (word) {
       setCurrentWord(word);
     }
@@ -81,7 +85,9 @@ const Index = () => {
 
   const handlePlayAgain = async () => {
     if (difficulty) {
+      setIsLoading(true);
       const word = await getRandomWord(difficulty);
+      setIsLoading(false);
       if (word) {
         setCurrentWord(word);
       }
@@ -145,14 +151,21 @@ const Index = () => {
 
           {difficulty && !currentWord && (
             <div className="flex justify-center">
-              <Button
-                onClick={handlePlayAgain}
-                className="btn-hover"
-                size="lg"
-              >
-                <RotateCw className="mr-2 h-4 w-4" />
-                Play Again
-              </Button>
+              {isLoading ? (
+                <Button disabled className="btn-hover" size="lg">
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Loading...
+                </Button>
+              ) : (
+                <Button
+                  onClick={handlePlayAgain}
+                  className="btn-hover"
+                  size="lg"
+                >
+                  <RotateCw className="mr-2 h-4 w-4" />
+                  Play Again
+                </Button>
+              )}
             </div>
           )}
 
