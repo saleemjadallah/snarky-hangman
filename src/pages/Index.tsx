@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { GameBoard } from "@/components/GameBoard";
 import { DifficultySelector } from "@/components/DifficultySelector";
@@ -100,16 +99,12 @@ const Index = () => {
           </div>
 
           <div className="flex items-center gap-6">
-            {user && (
-              <>
-                <div className="relative flex items-center">
-                  <Leaderboard />
-                </div>
-                <div className="relative flex items-center">
-                  <ProfileMenu />
-                </div>
-              </>
-            )}
+            <div className="relative flex items-center">
+              <Leaderboard />
+            </div>
+            <div className="relative flex items-center">
+              <ProfileMenu />
+            </div>
             {!user && isGuest && (
               <div className="flex items-center gap-4">
                 <span className="text-sm font-medium text-foreground">
