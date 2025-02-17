@@ -71,12 +71,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { data, error } = await AuthService.createTestSession(email);
       if (error) throw error;
 
-      // If we have a session, update the username and fetch profile
-      if (data.session?.user) {
-        await AuthService.updateUsername(data.session.user.id, username);
-        setUser(data.session.user);
-        await fetchProfile(data.session.user.id);
+      if (!data.session?.user) {
+        throw new Error("Failed to create user session");
       }
+
+      await AuthService.updateUsername(data.session.user.id, username);
+      setUser(data.session.user);
+      await fetchProfile(data.session.user.id);
 
       toast({
         title: "Welcome aboard!",
@@ -101,18 +102,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { data, error } = await AuthService.createTestSession(email);
       if (error) throw error;
 
-      // If we have a session, update the state immediately
-      if (data.session?.user) {
-        setUser(data.session.user);
-        await fetchProfile(data.session.user.id);
-        
-        toast({
-          title: "Welcome back!",
-          description: "You're now signed in and ready to play!",
-        });
-      } else {
-        throw new Error("Auth session missing!");
+      if (!data.session?.user) {
+        throw new Error("Failed to create user session");
       }
+
+      setUser(data.session.user);
+      await fetchProfile(data.session.user.id);
+      
+      toast({
+        title: "Welcome back!",
+        description: "You're now signed in and ready to play!",
+      });
     } catch (error: any) {
       console.error("Sign in error:", error);
       toast({

@@ -38,39 +38,37 @@ export async function updateUsername(userId: string, username: string): Promise<
 
 export async function createTestSession(email: string) {
   console.log("Creating test session for:", email);
-  
-  // First, try to get the existing session
-  const { data: { session: existingSession } } = await supabase.auth.getSession();
-  if (existingSession) {
-    console.log("Found existing session:", existingSession);
-    return { data: { session: existingSession }, error: null };
-  }
 
-  // Create test session via RPC
-  const { data: rpcData, error: rpcError } = await supabase.rpc('create_test_session', {
-    user_email: email
-  });
-  
-  if (rpcError) throw rpcError;
-  console.log("Test session created:", rpcData);
-  
-  // Wait for the database trigger to complete
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  // Get the session that was just created
-  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-  if (sessionError) throw sessionError;
-  
-  if (!session) {
-    console.log("No session found after creation, refreshing session...");
-    // Force a session refresh
+  try {
+    // Create test session via RPC
+    const { data: rpcData, error: rpcError } = await supabase.rpc('create_test_session', {
+      user_email: email
+    });
+    
+    if (rpcError) throw rpcError;
+    console.log("Test session created:", rpcData);
+    
+    // Wait for the database trigger to complete and session to be established
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    // Refresh the session state
     const { data, error } = await supabase.auth.refreshSession();
-    if (error) throw error;
+    if (error) {
+      console.error("Error refreshing session:", error);
+      throw error;
+    }
+
+    if (!data.session) {
+      console.error("No session found after refresh");
+      throw new Error("Failed to establish session");
+    }
+
+    console.log("Session established:", data.session);
     return { data, error: null };
+  } catch (error) {
+    console.error("Error in createTestSession:", error);
+    throw error;
   }
-  
-  console.log("Returning session:", session);
-  return { data: { session }, error: null };
 }
 
 export async function signOutUser() {
