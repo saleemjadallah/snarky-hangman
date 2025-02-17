@@ -39,27 +39,30 @@ export function ProfileMenu() {
             <DropdownMenuSeparator />
             <DeleteAccount userId={user.id} onDelete={signOut} />
           </>
+        ) : isGuest ? (
+          <DropdownMenuItem className="flex flex-col space-y-4 p-4">
+            <div className="text-center">
+              <p className="text-sm font-medium mb-2">Playing as {guestName}</p>
+              <p className="text-xs text-muted-foreground mb-4">
+                Sign in to save your progress and compete on the leaderboard
+              </p>
+              <Button variant="default" size="sm" onClick={() => window.location.reload()}>
+                <LogIn className="mr-2 h-4 w-4" />
+                Sign In
+              </Button>
+            </div>
+          </DropdownMenuItem>
         ) : (
           <DropdownMenuItem className="flex flex-col space-y-4 p-4">
             <div className="text-center">
-              <p className="text-sm font-medium mb-2">
-                {isGuest ? `Playing as ${guestName}` : "Welcome to Snarky Hangman!"}
-              </p>
+              <p className="text-sm font-medium mb-2">Welcome to Snarky Hangman!</p>
               <p className="text-xs text-muted-foreground mb-4">
-                {isGuest 
-                  ? "Sign in to save your progress and compete on the leaderboard"
-                  : "Sign in to track your progress and compete with others"}
+                Sign in to track your progress and compete with others
               </p>
-              {isGuest ? (
-                <Button variant="destructive" size="sm" onClick={signOut}>
-                  Sign Out
-                </Button>
-              ) : (
-                <Button variant="default" size="sm" onClick={() => window.location.reload()}>
-                  <LogIn className="mr-2 h-4 w-4" />
-                  Sign In
-                </Button>
-              )}
+              <Button variant="default" size="sm" onClick={() => window.location.reload()}>
+                <LogIn className="mr-2 h-4 w-4" />
+                Sign In
+              </Button>
             </div>
           </DropdownMenuItem>
         )}
