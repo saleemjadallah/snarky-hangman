@@ -1,16 +1,35 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Difficulty, Word, snarkyComments, difficultySettings } from "@/lib/game-data";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MessageCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface GameBoardProps {
   currentWord: Word;
   difficulty: Difficulty;
   onGameEnd: (won: boolean, score: number) => void;
 }
+
+const CACHE_KEY = 'word_cache';
+const MIN_CACHE_THRESHOLD = 5;
+
+interface WordCache {
+  [key in Difficulty]?: Word[];
+}
+
+const getWordCache = (): WordCache => {
+  try {
+    return JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
+  } catch {
+    return {};
+  }
+};
+
+const setWordCache = (cache: WordCache) => {
+  localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+};
 
 export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps) => {
   const [guessedLetters, setGuessedLetters] = useState<string[]>([]);
@@ -20,6 +39,36 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
 
   const word = currentWord.word.toUpperCase();
   const category = currentWord.category;
+
+  useEffect(() => {
+    const fetchWords = async () => {
+      const cache = getWordCache();
+      const wordsForDifficulty = cache[difficulty] || [];
+      
+      if (wordsForDifficulty.length <= MIN_CACHE_THRESHOLD) {
+        try {
+          const { data: newWords, error } = await supabase.functions.invoke('word-manager', {
+            body: {
+              difficulty,
+              count: 10,
+              excludeWords: wordsForDifficulty.map(w => w.word)
+            }
+          });
+
+          if (error) throw error;
+
+          cache[difficulty] = [...wordsForDifficulty, ...newWords];
+          setWordCache(cache);
+          
+          console.log(`Cached ${newWords.length} new words for ${difficulty} difficulty`);
+        } catch (error) {
+          console.error('Failed to fetch words:', error);
+        }
+      }
+    };
+
+    fetchWords();
+  }, [difficulty]);
 
   const maskWord = (word: string) => {
     return word

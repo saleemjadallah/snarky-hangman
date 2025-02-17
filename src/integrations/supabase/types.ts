@@ -249,6 +249,10 @@ export type Database = {
         }
         Returns: Json
       }
+      maintain_word_pools: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       achievement_type:
