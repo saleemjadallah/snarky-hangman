@@ -1,4 +1,5 @@
 
 project_id = "ogycucyovscunayusywa"
 [functions.generate-words]
-verify_jwt = true
+verify_jwt = false
+

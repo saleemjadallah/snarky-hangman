@@ -64,6 +64,7 @@ async function generateWords(difficulty: string, category: string): Promise<stri
     });
 
     if (!response.ok) {
+      console.error('Anthropic API error:', await response.text());
       throw new Error(`API call failed: ${response.statusText}`);
     }
 
@@ -81,71 +82,88 @@ async function generateWords(difficulty: string, category: string): Promise<stri
 }
 
 async function upsertWords(words: string[], difficulty: string, category: string) {
-  // First, check which words already exist
-  const { data: existingWords, error: checkError } = await supabase
-    .from('word_pool')
-    .select('word')
-    .in('word', words);
-
-  if (checkError) {
-    console.error('Error checking existing words:', checkError);
-    throw checkError;
-  }
-
-  const existingWordSet = new Set(existingWords?.map(w => w.word) || []);
-  const newWords = words.filter(word => !existingWordSet.has(word));
-
-  if (newWords.length > 0) {
-    const { error: insertError } = await supabase
+  try {
+    // First, check which words already exist
+    const { data: existingWords, error: checkError } = await supabase
       .from('word_pool')
-      .insert(newWords.map(word => ({
-        word,
-        difficulty,
-        category,
-        times_used: 0,
-        success_rate: 0,
-        active: true
-      })));
+      .select('word')
+      .in('word', words);
 
-    if (insertError) {
-      console.error('Error inserting new words:', insertError);
-      throw insertError;
+    if (checkError) {
+      console.error('Error checking existing words:', checkError);
+      throw checkError;
     }
-  }
 
-  // Reactivate existing words
-  if (existingWordSet.size > 0) {
-    const { error: updateError } = await supabase
-      .from('word_pool')
-      .update({ active: true })
-      .in('word', Array.from(existingWordSet));
+    const existingWordSet = new Set(existingWords?.map(w => w.word) || []);
+    const newWords = words.filter(word => !existingWordSet.has(word));
 
-    if (updateError) {
-      console.error('Error updating existing words:', updateError);
-      throw updateError;
+    if (newWords.length > 0) {
+      console.log('Inserting new words:', newWords);
+      const { error: insertError } = await supabase
+        .from('word_pool')
+        .insert(newWords.map(word => ({
+          word,
+          difficulty,
+          category,
+          times_used: 0,
+          success_rate: 0,
+          active: true
+        })));
+
+      if (insertError) {
+        console.error('Error inserting new words:', insertError);
+        throw insertError;
+      }
     }
+
+    // Reactivate existing words
+    if (existingWordSet.size > 0) {
+      console.log('Reactivating existing words:', Array.from(existingWordSet));
+      const { error: updateError } = await supabase
+        .from('word_pool')
+        .update({ active: true })
+        .in('word', Array.from(existingWordSet));
+
+      if (updateError) {
+        console.error('Error updating existing words:', updateError);
+        throw updateError;
+      }
+    }
+  } catch (error) {
+    console.error('Error in upsertWords:', error);
+    throw error;
   }
 }
 
 serve(async (req) => {
+  // Handle CORS preflight request
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, {
+      status: 204,
+      headers: corsHeaders
+    });
   }
 
   try {
     const { difficulty, category } = await req.json();
+    console.log('Received request:', { difficulty, category });
 
     if (!difficulty || !category) {
       throw new Error('Missing required parameters');
     }
 
     // Check current word pool status
-    const { data: poolStats } = await supabase
+    const { data: poolStats, error: statsError } = await supabase
       .from('word_pool_stats')
       .select('*')
       .eq('difficulty', difficulty)
       .eq('category', category)
       .single();
+
+    if (statsError && statsError.code !== 'PGRST116') { // Ignore "no rows returned" error
+      console.error('Error checking pool stats:', statsError);
+      throw statsError;
+    }
 
     // Generate new words if pool is low or doesn't exist
     if (!poolStats || poolStats.active_words < 50) {
@@ -153,6 +171,8 @@ serve(async (req) => {
       const newWords = await generateWords(difficulty, category);
       await upsertWords(newWords, difficulty, category);
       console.log(`Successfully added/updated ${newWords.length} words`);
+    } else {
+      console.log('Sufficient words in pool:', poolStats.active_words);
     }
 
     return new Response(JSON.stringify({ success: true }), {
@@ -160,9 +180,14 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error('Error in generate-words function:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify({ 
+        error: error.message,
+        details: error.stack || 'No stack trace available'
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
   }
 });
