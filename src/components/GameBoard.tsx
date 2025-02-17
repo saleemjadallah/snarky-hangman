@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Difficulty, Word, snarkyComments, difficultySettings } from "@/lib/game-data";
@@ -13,14 +14,14 @@ interface GameBoardProps {
   onGameEnd: (won: boolean, score: number) => void;
 }
 
-const CACHE_KEY = 'word_cache';
-const MIN_CACHE_THRESHOLD = 5;
-
 interface WordCache {
   easy?: Word[];
   medium?: Word[];
   hard?: Word[];
 }
+
+const CACHE_KEY = 'word_cache';
+const MIN_CACHE_THRESHOLD = 5;
 
 const getWordCache = (): WordCache => {
   try {
@@ -38,6 +39,7 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
   const [guessedLetters, setGuessedLetters] = useState<string[]>([]);
   const [remainingGuesses, setRemainingGuesses] = useState(difficultySettings[difficulty].maxGuesses);
   const [message, setMessage] = useState("");
+  const [isGameFinished, setIsGameFinished] = useState(false);
   const { toast } = useToast();
 
   const word = currentWord.word.toUpperCase();
@@ -47,34 +49,30 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
   const gameWon = word.split("").every((letter) => guessedLetters.includes(letter));
 
   useEffect(() => {
-    const fetchWords = async () => {
-      const cache = getWordCache();
-      const wordsForDifficulty = cache[difficulty] || [];
+    // Reset state when a new word is received
+    setGuessedLetters([]);
+    setRemainingGuesses(difficultySettings[difficulty].maxGuesses);
+    setMessage("");
+    setIsGameFinished(false);
+  }, [currentWord, difficulty]);
+
+  useEffect(() => {
+    if (isGameOver && !isGameFinished) {
+      setIsGameFinished(true);
+      const score = gameWon ? calculateScore(guessedLetters, word) : 0;
       
-      if (wordsForDifficulty.length <= MIN_CACHE_THRESHOLD) {
-        try {
-          const { data: newWords, error } = await supabase.functions.invoke('word-manager', {
-            body: {
-              difficulty,
-              count: 10,
-              excludeWords: wordsForDifficulty.map(w => w.word)
-            }
-          });
+      setTimeout(() => {
+        onGameEnd(gameWon, score);
+      }, 2000); // Give time for the avatar animation to play
+    }
+  }, [isGameOver, isGameFinished]);
 
-          if (error) throw error;
-
-          cache[difficulty] = [...wordsForDifficulty, ...newWords];
-          setWordCache(cache);
-          
-          console.log(`Cached ${newWords.length} new words for ${difficulty} difficulty`);
-        } catch (error) {
-          console.error('Failed to fetch words:', error);
-        }
-      }
-    };
-
-    fetchWords();
-  }, [difficulty]);
+  const calculateScore = (guessed: string[], word: string) => {
+    const uniqueLetters = new Set(word).size;
+    const wrongGuesses = guessed.filter(letter => !word.includes(letter)).length;
+    const baseScore = uniqueLetters * difficultySettings[difficulty].pointsPerLetter;
+    return Math.max(0, baseScore - (wrongGuesses * 5));
+  };
 
   const maskWord = (word: string) => {
     return word
@@ -84,11 +82,7 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
   };
 
   const handleGuess = (letter: string) => {
-    if (guessedLetters.includes(letter)) {
-      toast({
-        title: "Already guessed!",
-        description: "Try a different letter, Einstein.",
-      });
+    if (isGameOver || guessedLetters.includes(letter)) {
       return;
     }
 
@@ -109,41 +103,22 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
           description: loseComment,
           variant: "destructive",
         });
-        onGameEnd(false, 0);
       }
     } else {
       const comment = snarkyComments.goodGuess[Math.floor(Math.random() * snarkyComments.goodGuess.length)];
       setMessage(comment);
 
-      if (gameWon) {
+      // Check if this guess wins the game
+      if (word.split("").every(l => newGuessedLetters.includes(l))) {
         const winComment = snarkyComments.win[Math.floor(Math.random() * snarkyComments.win.length)];
         const score = calculateScore(newGuessedLetters, word);
         toast({
           title: "You Won!",
-          description: winComment,
+          description: `${winComment} Score: ${score}`,
         });
-        onGameEnd(true, score);
       }
     }
   };
-
-  const calculateScore = (guessed: string[], word: string) => {
-    const uniqueLetters = new Set(word).size;
-    const wrongGuesses = guessed.filter((letter) => !word.includes(letter)).length;
-    return (uniqueLetters * difficultySettings[difficulty].pointsPerLetter) - (wrongGuesses * 5);
-  };
-
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      const letter = e.key.toUpperCase();
-      if (/^[A-Z]$/.test(letter)) {
-        handleGuess(letter);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyPress);
-    return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [guessedLetters, word]);
 
   return (
     <div className="w-full max-w-2xl mx-auto p-6 glass rounded-xl space-y-8">
@@ -185,7 +160,7 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
             className={`w-10 h-10 ${
               guessedLetters.includes(letter) ? "opacity-50" : "btn-hover"
             }`}
-            disabled={guessedLetters.includes(letter)}
+            disabled={guessedLetters.includes(letter) || isGameOver}
             onClick={() => handleGuess(letter)}
           >
             {letter}

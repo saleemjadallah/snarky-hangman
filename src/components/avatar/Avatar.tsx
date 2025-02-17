@@ -1,10 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SpeechBubble } from "./SpeechBubble";
 import { AvatarPart } from "./AvatarPart";
 import { cn } from "@/lib/utils";
-import { MessageCircle } from "lucide-react";
 
 export interface AvatarProps {
   wrongGuesses: number;
@@ -48,7 +46,7 @@ export const Avatar = ({
       const timer = setTimeout(() => setShowSpeechBubble(false), 3000);
       return () => clearTimeout(timer);
     }
-  }, [wrongGuesses, maxGuesses]);
+  }, [wrongGuesses]);
 
   useEffect(() => {
     if (isGameOver) {
@@ -58,76 +56,57 @@ export const Avatar = ({
           : "Game over! I knew you couldn't handle my intellectual superiority!"
       );
       setShowSpeechBubble(true);
+      
+      const timer = setTimeout(() => setShowSpeechBubble(false), 5000);
+      return () => clearTimeout(timer);
     }
   }, [isGameOver, gameWon]);
+
+  const parts = [];
+  for (let i = 1; i <= wrongGuesses; i++) {
+    switch(i) {
+      case 1:
+        parts.push("head");
+        break;
+      case 2:
+        parts.push("body");
+        break;
+      case 3:
+        parts.push("leftArm");
+        break;
+      case 4:
+        parts.push("rightArm");
+        break;
+      case 5:
+        parts.push("leftLeg");
+        break;
+      case 6:
+        parts.push("rightLeg");
+        break;
+    }
+  }
 
   return (
     <div className={cn("relative w-[300px] h-[300px]", className)}>
       <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="relative w-full h-full"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="relative w-full h-full flex items-center justify-center"
       >
-        {/* Base avatar container */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <AnimatePresence>
-            {/* Head */}
-            {wrongGuesses >= 1 && (
-              <AvatarPart
-                type="head"
-                className="absolute"
-                style={{ top: "20%" }}
-              />
-            )}
-            
-            {/* Body */}
-            {wrongGuesses >= 2 && (
-              <AvatarPart
-                type="body"
-                className="absolute"
-                style={{ top: "45%" }}
-              />
-            )}
-            
-            {/* Left Arm */}
-            {wrongGuesses >= 3 && (
-              <AvatarPart
-                type="leftArm"
-                className="absolute"
-                style={{ top: "45%", left: "35%" }}
-              />
-            )}
-            
-            {/* Right Arm */}
-            {wrongGuesses >= 4 && (
-              <AvatarPart
-                type="rightArm"
-                className="absolute"
-                style={{ top: "45%", right: "35%" }}
-              />
-            )}
-            
-            {/* Left Leg */}
-            {wrongGuesses >= 5 && (
-              <AvatarPart
-                type="leftLeg"
-                className="absolute"
-                style={{ bottom: "20%", left: "45%" }}
-              />
-            )}
-            
-            {/* Right Leg */}
-            {wrongGuesses >= 6 && (
-              <AvatarPart
-                type="rightLeg"
-                className="absolute"
-                style={{ bottom: "20%", right: "45%" }}
-              />
-            )}
-          </AnimatePresence>
-        </div>
+        <AnimatePresence>
+          {parts.map((part, index) => (
+            <AvatarPart
+              key={part}
+              type={part as any}
+              className="absolute"
+              style={{
+                ...getPositionStyle(part as any),
+                zIndex: index
+              }}
+            />
+          ))}
+        </AnimatePresence>
 
-        {/* Speech Bubble */}
         <AnimatePresence>
           {showSpeechBubble && message && (
             <SpeechBubble
@@ -139,4 +118,23 @@ export const Avatar = ({
       </motion.div>
     </div>
   );
+};
+
+const getPositionStyle = (part: string): React.CSSProperties => {
+  switch(part) {
+    case "head":
+      return { top: "20%" };
+    case "body":
+      return { top: "45%" };
+    case "leftArm":
+      return { top: "45%", left: "35%" };
+    case "rightArm":
+      return { top: "45%", right: "35%" };
+    case "leftLeg":
+      return { bottom: "20%", left: "45%" };
+    case "rightLeg":
+      return { bottom: "20%", right: "45%" };
+    default:
+      return {};
+  }
 };
