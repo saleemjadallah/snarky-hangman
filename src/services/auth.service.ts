@@ -11,7 +11,7 @@ export async function signUp(email: string, username: string): Promise<AuthRespo
         data: {
           username // Store username in user metadata
         },
-        emailRedirectTo: window.location.origin // Ensure redirect happens to the correct URL
+        emailRedirectTo: `${window.location.origin}/` // Ensure redirect happens to the correct URL with trailing slash
       }
     });
 
@@ -26,7 +26,7 @@ export async function signIn(email: string): Promise<AuthResponse> {
   const response = await supabase.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: window.location.origin // Ensure redirect happens to the correct URL
+      emailRedirectTo: `${window.location.origin}/` // Ensure redirect happens to the correct URL with trailing slash
     }
   });
 
