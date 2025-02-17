@@ -18,6 +18,32 @@ import { LogIn } from "lucide-react";
 export function ProfileMenu() {
   const { user, profile, signOut, isGuest, guestName } = useAuth();
 
+  // Add console logs to debug authentication state
+  console.log("Auth state:", { user, profile, isGuest, guestName });
+
+  // If we have a user but no profile, we should wait for the profile to load
+  if (user && !profile) {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            className="relative h-8 w-8 rounded-full transition-all hover:scale-110"
+          >
+            <UserAvatar name="Loading..." />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-80" align="end">
+          <DropdownMenuItem className="flex flex-col space-y-4 p-4">
+            <div className="text-center">
+              <p className="text-sm font-medium">Loading profile...</p>
+            </div>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -28,8 +54,8 @@ export function ProfileMenu() {
           <UserAvatar name={profile?.username || guestName || "Guest"} />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-80" align="end" forceMount>
-        {user && profile ? (
+      <DropdownMenuContent className="w-80" align="end">
+        {profile ? (
           <>
             <ProfileHeader profile={profile} />
             <DropdownMenuSeparator />
@@ -37,7 +63,7 @@ export function ProfileMenu() {
               <GameStatistics profile={profile} />
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DeleteAccount userId={user.id} onDelete={signOut} />
+            <DeleteAccount userId={user!.id} onDelete={signOut} />
           </>
         ) : isGuest ? (
           <DropdownMenuItem className="flex flex-col space-y-4 p-4">
