@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -95,6 +94,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signUp = async (email: string, username: string) => {
     setIsLoading(true);
     try {
+      // First check if username is taken
       const { data: existingUsers, error: searchError } = await supabase
         .from('profiles')
         .select('username')
@@ -105,11 +105,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error("Username already taken");
       }
 
+      // Create the user session
       const { data, error } = await supabase.rpc('create_test_session', {
         user_email: email
       });
 
       if (error) throw error;
+
+      // Wait a moment for the trigger to create the profile
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Fetch the session to get the user
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        // Update the username in the profile
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ username })
+          .eq('id', session.user.id);
+
+        if (updateError) throw updateError;
+
+        await fetchProfile(session.user.id);
+      }
 
       toast({
         title: "Welcome aboard!",
@@ -117,8 +135,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
     } catch (error: any) {
       console.error("Signup error:", error);
-      setIsLoading(false);
+      toast({
+        title: "Signup failed",
+        description: error.message,
+        variant: "destructive",
+      });
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -130,6 +154,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (error) throw error;
+
+      // Wait a moment for the session to be created
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Fetch the session to get the user
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        await fetchProfile(session.user.id);
+      }
       
       toast({
         title: "Welcome back!",
@@ -137,8 +170,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
     } catch (error: any) {
       console.error("Sign in error:", error);
-      setIsLoading(false);
+      toast({
+        title: "Sign in failed",
+        description: error.message,
+        variant: "destructive",
+      });
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
