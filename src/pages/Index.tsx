@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { GameBoard } from "@/components/GameBoard";
 import { DifficultySelector } from "@/components/DifficultySelector";
@@ -78,10 +79,43 @@ const Index = () => {
   };
 
   const handleGameEnd = async (won: boolean, gameScore: number) => {
-    if (won) {
-      setScore((prev) => prev + gameScore);
+    if (!user && !isGuest) return;
+
+    try {
+      // Insert game session record
+      const { error: sessionError } = await supabase
+        .from('game_sessions')
+        .insert({
+          user_id: user?.id,
+          difficulty: difficulty,
+          word_category: currentWord?.category,
+          score: gameScore,
+          wrong_guesses: won ? 0 : 6, // Adjust based on actual wrong guesses
+          perfect_game: won,
+          abandoned: !won
+        });
+
+      if (sessionError) throw sessionError;
+
+      // Update local score
+      if (won) {
+        setScore((prev) => prev + gameScore);
+      }
+
+      // Clear current word to show play again button
+      setCurrentWord(null);
+
+      // Invalidate leaderboard cache to force refresh
+      await supabase.rpc('maintain_word_pools');
+
+    } catch (error) {
+      console.error('Error updating game stats:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update game statistics.",
+        variant: "destructive"
+      });
     }
-    setCurrentWord(null);
   };
 
   const handlePlayAgain = async () => {
