@@ -1,22 +1,30 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { Profile } from "@/types/auth";
+import { Database } from "@/integrations/supabase/types";
 
-interface TestSessionResponse {
+// Define the expected response type from create_test_session RPC
+type RPCResponse<T> = T extends keyof Database['public']['Functions'] 
+  ? Database['public']['Functions'][T]['Returns'] 
+  : never;
+
+type TestSessionResponse = {
   user_id: string;
   email: string;
-}
+};
 
 export async function signUp(email: string, username: string) {
   // First create the test session with just email
-  const { data: sessionData, error: sessionError } = await supabase.rpc<TestSessionResponse>('create_test_session', {
-    user_email: email
-  });
+  const { data: sessionData, error: sessionError } = await supabase.rpc(
+    'create_test_session',
+    { user_email: email }
+  );
   
   if (sessionError) throw sessionError;
-  if (!sessionData) throw new Error('No session data returned');
+  if (!sessionData || typeof sessionData !== 'object') throw new Error('No session data returned');
   
-  console.log("Test session created:", sessionData);
+  const typedSessionData = sessionData as TestSessionResponse;
+  console.log("Test session created:", typedSessionData);
 
   // Wait for the database trigger to complete
   await new Promise(resolve => setTimeout(resolve, 1000));
@@ -25,7 +33,7 @@ export async function signUp(email: string, username: string) {
   const { error: updateError } = await supabase
     .from('profiles')
     .update({ username })
-    .eq('id', sessionData.user_id);
+    .eq('id', typedSessionData.user_id);
 
   if (updateError) throw updateError;
 
@@ -44,14 +52,16 @@ export async function signUp(email: string, username: string) {
 
 export async function signIn(email: string) {
   // Create test session for existing user
-  const { data: sessionData, error: sessionError } = await supabase.rpc<TestSessionResponse>('create_test_session', {
-    user_email: email
-  });
+  const { data: sessionData, error: sessionError } = await supabase.rpc(
+    'create_test_session',
+    { user_email: email }
+  );
   
   if (sessionError) throw sessionError;
-  if (!sessionData) throw new Error('No session data returned');
+  if (!sessionData || typeof sessionData !== 'object') throw new Error('No session data returned');
   
-  console.log("Test session created:", sessionData);
+  const typedSessionData = sessionData as TestSessionResponse;
+  console.log("Test session created:", typedSessionData);
 
   // Wait for the database trigger to complete
   await new Promise(resolve => setTimeout(resolve, 1000));
