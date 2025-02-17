@@ -16,9 +16,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserAvatar } from "./UserAvatar";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface LeaderboardEntry {
-  id: string;  // Added this property to fix the TypeScript error
+  id: string;
   username: string;
   total_score: number;
   best_score: number;
@@ -34,18 +35,33 @@ interface LeaderboardEntry {
 export function Leaderboard() {
   const [activeTab, setActiveTab] = useState("global");
   const { user } = useAuth();
+  const { toast } = useToast();
 
   const { data: rankings, isLoading } = useQuery({
     queryKey: ["leaderboard", activeTab],
+    enabled: !!user,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("global_rankings")
-        .select("*")
-        .order("total_score", { ascending: false })
-        .limit(100);
+      try {
+        const { data, error } = await supabase
+          .from("global_rankings")
+          .select("*")
+          .order("total_score", { ascending: false })
+          .limit(100);
 
-      if (error) throw error;
-      return data as LeaderboardEntry[];
+        if (error) {
+          console.error("Leaderboard fetch error:", error);
+          throw error;
+        }
+
+        return data as LeaderboardEntry[];
+      } catch (error: any) {
+        toast({
+          title: "Error loading leaderboard",
+          description: "Please try again later",
+          variant: "destructive",
+        });
+        return [];
+      }
     },
   });
 
@@ -53,14 +69,27 @@ export function Leaderboard() {
     queryKey: ["userRank", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("global_rankings")
-        .select("*")
-        .eq("id", user!.id)
-        .single();
+      try {
+        const { data, error } = await supabase
+          .from("global_rankings")
+          .select("*")
+          .eq("id", user!.id)
+          .single();
 
-      if (error) throw error;
-      return data as LeaderboardEntry;
+        if (error) {
+          console.error("User rank fetch error:", error);
+          throw error;
+        }
+
+        return data as LeaderboardEntry;
+      } catch (error: any) {
+        toast({
+          title: "Error loading your rank",
+          description: "Please try again later",
+          variant: "destructive",
+        });
+        return null;
+      }
     },
   });
 
@@ -101,11 +130,15 @@ export function Leaderboard() {
                 <div className="flex items-center justify-center h-full">
                   Loading...
                 </div>
+              ) : !rankings?.length ? (
+                <div className="flex items-center justify-center h-full text-muted-foreground">
+                  No rankings available yet
+                </div>
               ) : (
                 <div className="space-y-4">
-                  {rankings?.map((entry, index) => (
+                  {rankings.map((entry, index) => (
                     <div
-                      key={entry.username}
+                      key={entry.id}
                       className={`flex items-center space-x-4 p-3 rounded-lg transition-colors ${
                         user?.id === entry.id
                           ? "bg-primary/10"
@@ -137,7 +170,7 @@ export function Leaderboard() {
                       <div className="text-right">
                         <p className="text-sm font-medium">{entry.total_score.toLocaleString()}</p>
                         <p className="text-xs text-muted-foreground">
-                          Avg: {entry.avg_score_per_game}
+                          Avg: {Math.round(entry.avg_score_per_game)}
                         </p>
                       </div>
                     </div>
