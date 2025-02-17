@@ -43,16 +43,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signUp = async (email: string, username: string) => {
     setIsLoading(true);
     try {
-      const { session } = await AuthService.signUp(email, username);
-      if (!session) throw new Error("Failed to create session");
+      const response = await AuthService.signUp(email, username);
+      if (response.error) throw response.error;
       
-      setUser(session.user);
-      const profile = await AuthService.fetchProfile(session.user.id);
-      setProfile(profile);
-
       toast({
-        title: "Welcome!",
-        description: "Your account has been created successfully.",
+        title: "Magic link sent!",
+        description: "Please check your email to sign in.",
       });
     } catch (error: any) {
       console.error("Signup error:", error);
@@ -70,16 +66,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signIn = async (email: string) => {
     setIsLoading(true);
     try {
-      const { session } = await AuthService.signIn(email);
-      if (!session) throw new Error("Failed to create session");
-
-      setUser(session.user);
-      const profile = await AuthService.fetchProfile(session.user.id);
-      setProfile(profile);
+      const response = await AuthService.signIn(email);
+      if (response.error) throw response.error;
 
       toast({
-        title: "Welcome back!",
-        description: "You've been signed in successfully.",
+        title: "Magic link sent!",
+        description: "Please check your email to sign in.",
       });
     } catch (error: any) {
       console.error("Sign in error:", error);

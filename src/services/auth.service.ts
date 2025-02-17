@@ -1,10 +1,11 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { Profile } from "@/types/auth";
+import { AuthResponse } from "@supabase/supabase-js";
 
-export async function signUp(email: string, username: string) {
+export async function signUp(email: string, username: string): Promise<AuthResponse> {
   try {
-    const { data, error } = await supabase.auth.signInWithOtp({
+    const response = await supabase.auth.signInWithOtp({
       email,
       options: {
         data: {
@@ -14,24 +15,23 @@ export async function signUp(email: string, username: string) {
       }
     });
 
-    if (error) throw error;
-
-    return { data };
+    if (response.error) throw response.error;
+    return response;
   } catch (error: any) {
     throw error;
   }
 }
 
-export async function signIn(email: string) {
-  const { data, error } = await supabase.auth.signInWithOtp({
+export async function signIn(email: string): Promise<AuthResponse> {
+  const response = await supabase.auth.signInWithOtp({
     email,
     options: {
       emailRedirectTo: window.location.origin // Ensure redirect happens to the correct URL
     }
   });
 
-  if (error) throw error;
-  return { data };
+  if (response.error) throw response.error;
+  return response;
 }
 
 export async function fetchProfile(userId: string): Promise<Profile | null> {
