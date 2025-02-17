@@ -70,7 +70,7 @@ async function generateWords(difficulty: string, category: string): Promise<stri
     const data = await response.json();
     const wordList = data.content[0].text
       .split(',')
-      .map((word: string) => word.trim())
+      .map((word: string) => word.trim().toUpperCase())
       .filter((word: string) => word.length > 0);
 
     return wordList;
@@ -80,21 +80,50 @@ async function generateWords(difficulty: string, category: string): Promise<stri
   }
 }
 
-async function cacheWords(words: string[], difficulty: string, category: string) {
-  const { error } = await supabase.from('word_pool').insert(
-    words.map(word => ({
-      word: word.toUpperCase(),
-      difficulty,
-      category,
-      times_used: 0,
-      success_rate: 0,
-      active: true
-    }))
-  );
+async function upsertWords(words: string[], difficulty: string, category: string) {
+  // First, check which words already exist
+  const { data: existingWords, error: checkError } = await supabase
+    .from('word_pool')
+    .select('word')
+    .in('word', words);
 
-  if (error) {
-    console.error('Error caching words:', error);
-    throw error;
+  if (checkError) {
+    console.error('Error checking existing words:', checkError);
+    throw checkError;
+  }
+
+  const existingWordSet = new Set(existingWords?.map(w => w.word) || []);
+  const newWords = words.filter(word => !existingWordSet.has(word));
+
+  if (newWords.length > 0) {
+    const { error: insertError } = await supabase
+      .from('word_pool')
+      .insert(newWords.map(word => ({
+        word,
+        difficulty,
+        category,
+        times_used: 0,
+        success_rate: 0,
+        active: true
+      })));
+
+    if (insertError) {
+      console.error('Error inserting new words:', insertError);
+      throw insertError;
+    }
+  }
+
+  // Reactivate existing words
+  if (existingWordSet.size > 0) {
+    const { error: updateError } = await supabase
+      .from('word_pool')
+      .update({ active: true })
+      .in('word', Array.from(existingWordSet));
+
+    if (updateError) {
+      console.error('Error updating existing words:', updateError);
+      throw updateError;
+    }
   }
 }
 
@@ -120,8 +149,10 @@ serve(async (req) => {
 
     // Generate new words if pool is low or doesn't exist
     if (!poolStats || poolStats.active_words < 50) {
+      console.log(`Generating new words for ${difficulty} ${category}`);
       const newWords = await generateWords(difficulty, category);
-      await cacheWords(newWords, difficulty, category);
+      await upsertWords(newWords, difficulty, category);
+      console.log(`Successfully added/updated ${newWords.length} words`);
     }
 
     return new Response(JSON.stringify({ success: true }), {
