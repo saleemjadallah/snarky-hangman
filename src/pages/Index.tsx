@@ -97,6 +97,20 @@ const Index = () => {
 
       if (sessionError) throw sessionError;
 
+      // Update games played count based on difficulty
+      const difficultyColumn = `${difficulty}_games_played`;
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          [difficultyColumn]: (profile?.[difficultyColumn] || 0) + 1,
+          total_score: (profile?.total_score || 0) + (won ? gameScore : 0),
+          best_score: won ? Math.max(profile?.best_score || 0, gameScore) : profile?.best_score || 0,
+          last_played_at: new Date().toISOString()
+        })
+        .eq('id', user?.id);
+
+      if (profileError) throw profileError;
+
       // Update local score
       if (won) {
         setScore((prev) => prev + gameScore);
