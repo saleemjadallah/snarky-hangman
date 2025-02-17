@@ -38,19 +38,39 @@ export async function updateUsername(userId: string, username: string): Promise<
 
 export async function createTestSession(email: string) {
   console.log("Creating test session for:", email);
-  const { data, error } = await supabase.rpc('create_test_session', {
+  
+  // First, try to get the existing session
+  const { data: { session: existingSession } } = await supabase.auth.getSession();
+  if (existingSession) {
+    console.log("Found existing session:", existingSession);
+    return { data: { session: existingSession }, error: null };
+  }
+
+  // Create test session via RPC
+  const { data: rpcData, error: rpcError } = await supabase.rpc('create_test_session', {
     user_email: email
   });
   
-  if (error) throw error;
+  if (rpcError) throw rpcError;
+  console.log("Test session created:", rpcData);
   
-  // Wait a moment for the user to be created
+  // Wait for the database trigger to complete
   await new Promise(resolve => setTimeout(resolve, 1000));
   
-  // Instead of password sign in, we'll use a magic link
-  return await supabase.auth.signInWithOtp({
-    email: email,
-  });
+  // Get the session that was just created
+  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+  if (sessionError) throw sessionError;
+  
+  if (!session) {
+    console.log("No session found after creation, refreshing session...");
+    // Force a session refresh
+    const { data, error } = await supabase.auth.refreshSession();
+    if (error) throw error;
+    return { data, error: null };
+  }
+  
+  console.log("Returning session:", session);
+  return { data: { session }, error: null };
 }
 
 export async function signOutUser() {
