@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Difficulty, Word, snarkyComments, difficultySettings } from "@/lib/game-data";
@@ -16,7 +17,9 @@ const CACHE_KEY = 'word_cache';
 const MIN_CACHE_THRESHOLD = 5;
 
 interface WordCache {
-  [key in Difficulty]?: Word[];
+  easy?: Word[];
+  medium?: Word[];
+  hard?: Word[];
 }
 
 const getWordCache = (): WordCache => {
