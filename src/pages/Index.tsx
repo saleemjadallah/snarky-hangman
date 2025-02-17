@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { GameBoard } from "@/components/GameBoard";
 import { DifficultySelector } from "@/components/DifficultySelector";
@@ -23,10 +22,12 @@ const Index = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!user && !isGuest) {
+    if (!user && !isGuest && !isLoading) {
       setShowRegistration(true);
+    } else {
+      setShowRegistration(false);
     }
-  }, [user, isGuest]);
+  }, [user, isGuest, isLoading]);
 
   const getRandomWord = async (difficulty: Difficulty) => {
     try {
