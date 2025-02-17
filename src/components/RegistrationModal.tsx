@@ -90,7 +90,7 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Where should we send your magic link?"
+                  placeholder="Where can we reach you?"
                   className="w-full"
                 />
                 {email && !isValidEmail && (
@@ -104,7 +104,7 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Getting ready...
+                      Creating account...
                     </>
                   ) : (
                     "Start Playing!"
@@ -145,7 +145,7 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Sending magic link...
+                    Signing you in...
                   </>
                 ) : (
                   "Sign In"
