@@ -32,16 +32,17 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
     try {
       await signUp(email, username);
       toast({
-        title: "Account created!",
-        description: "Please check your email to verify your account.",
+        title: "Magic link sent!",
+        description: "Please check your email to sign in.",
       });
       onClose();
     } catch (error: any) {
       toast({
-        title: "Error creating account",
+        title: "Error sending magic link",
         description: error.message,
         variant: "destructive",
       });
+    } finally {
       setIsLoading(false);
     }
   };
@@ -54,16 +55,17 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
     try {
       await signIn(email);
       toast({
-        title: "Welcome back!",
-        description: "You've been successfully signed in.",
+        title: "Magic link sent!",
+        description: "Please check your email to sign in.",
       });
       onClose();
     } catch (error: any) {
       toast({
-        title: "Error signing in",
+        title: "Error sending magic link",
         description: error.message,
         variant: "destructive",
       });
+    } finally {
       setIsLoading(false);
     }
   };
@@ -81,7 +83,7 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-center">Welcome to Snarky Hangman!</DialogTitle>
           <DialogDescription className="text-center pt-2">
-            Sign up or sign in to start playing!
+            Enter your email to receive a magic link to sign in
           </DialogDescription>
         </DialogHeader>
         
@@ -130,7 +132,7 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Creating account...
+                      Sending magic link...
                     </>
                   ) : (
                     "Sign Up"
@@ -171,7 +173,7 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Signing in...
+                    Sending magic link...
                   </>
                 ) : (
                   "Sign In"

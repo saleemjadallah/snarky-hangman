@@ -3,63 +3,35 @@ import { supabase } from "@/integrations/supabase/client";
 import { Profile } from "@/types/auth";
 
 export async function signUp(email: string, username: string) {
-  // Generate a simple password for demo purposes (in production, you'd want a proper password field)
-  const password = `${email}_${Date.now()}`;
-
   try {
-    // First create the actual user account
-    const { data: authData, error: signUpError } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signInWithOtp({
       email,
-      password,
       options: {
         data: {
-          username: username // Store username in user metadata
-        }
+          username // Store username in user metadata
+        },
+        emailRedirectTo: window.location.origin // Ensure redirect happens to the correct URL
       }
     });
 
-    if (signUpError) {
-      // If user already exists, try to sign in instead
-      if (signUpError.message === "User already registered") {
-        throw new Error("This email is already registered. Please sign in instead.");
-      }
-      throw signUpError;
-    }
+    if (error) throw error;
 
-    if (!authData.user) throw new Error('No user data returned');
-
-    // Store the password in localStorage for this demo (NOT recommended for production!)
-    localStorage.setItem(`pwd_${email}`, password);
-
-    // The profile will be created automatically by our database trigger
-    console.log("User created:", authData);
-
-    return { session: authData.session };
+    return { data };
   } catch (error: any) {
-    if (error.message === "User already registered") {
-      throw new Error("This email is already registered. Please sign in instead.");
-    }
     throw error;
   }
 }
 
 export async function signIn(email: string) {
-  // Retrieve the stored password for this demo
-  const password = localStorage.getItem(`pwd_${email}`);
-  
-  if (!password) {
-    throw new Error('Account not found. Please sign up first.');
-  }
-
-  const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithOtp({
     email,
-    password
+    options: {
+      emailRedirectTo: window.location.origin // Ensure redirect happens to the correct URL
+    }
   });
 
-  if (signInError) throw signInError;
-  if (!authData.session) throw new Error('No session established');
-
-  return { session: authData.session };
+  if (error) throw error;
+  return { data };
 }
 
 export async function fetchProfile(userId: string): Promise<Profile | null> {
@@ -74,11 +46,6 @@ export async function fetchProfile(userId: string): Promise<Profile | null> {
 }
 
 export async function signOut() {
-  // Clear stored password on signout
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session?.user?.email) {
-    localStorage.removeItem(`pwd_${session.user.email}`);
-  }
   return await supabase.auth.signOut();
 }
 
