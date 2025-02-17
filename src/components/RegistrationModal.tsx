@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
 
 interface RegistrationModalProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { signUp, signIn, setGuestName } = useAuth();
+  const { toast } = useToast();
 
   const isValidUsername = username.length >= 2 && username.length <= 30;
   const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -28,9 +30,18 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
     if (!canSubmit) return;
 
     setIsLoading(true);
-    await signUp(email, username);
-    setIsLoading(false);
-    onClose();
+    try {
+      await signUp(email, username);
+      onClose();
+    } catch (error: any) {
+      toast({
+        title: "Signup failed",
+        description: error.message || "Something went wrong",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSignIn = async (e: React.FormEvent) => {
@@ -38,9 +49,18 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
     if (!isValidEmail || isLoading) return;
 
     setIsLoading(true);
-    await signIn(email);
-    setIsLoading(false);
-    onClose();
+    try {
+      await signIn(email);
+      onClose();
+    } catch (error: any) {
+      toast({
+        title: "Sign in failed",
+        description: error.message || "Something went wrong",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const playAsGuest = () => {
@@ -76,6 +96,7 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Your nickname"
                   className="w-full"
+                  disabled={isLoading}
                 />
                 {username && !isValidUsername && (
                   <p className="text-sm text-red-500">
@@ -92,6 +113,7 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Where can we reach you?"
                   className="w-full"
+                  disabled={isLoading}
                 />
                 {email && !isValidEmail && (
                   <p className="text-sm text-red-500">
@@ -115,7 +137,7 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
                   variant="ghost"
                   className="w-full"
                   onClick={playAsGuest}
-                  disabled={!isValidUsername}
+                  disabled={!isValidUsername || isLoading}
                 >
                   Just play as guest
                 </Button>
@@ -134,6 +156,7 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email to sign in"
                   className="w-full"
+                  disabled={isLoading}
                 />
                 {email && !isValidEmail && (
                   <p className="text-sm text-red-500">

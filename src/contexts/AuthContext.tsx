@@ -2,7 +2,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface AuthContextType {
   user: User | null;
@@ -41,103 +41,84 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [guestName, setGuestName] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
-    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
-          .then(({ data, error }) => {
-            if (error) {
-              console.error('Error fetching profile:', error);
-            } else {
-              setProfile(data);
-            }
-            setIsLoading(false);
-          });
+        fetchProfile(session.user.id);
       } else {
         setIsLoading(false);
       }
     });
 
-    // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event, session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-        
-        if (error) {
-          console.error('Error fetching profile:', error);
-        } else {
-          setProfile(data);
-        }
+        await fetchProfile(session.user.id);
       } else {
         setProfile(null);
+        setIsLoading(false);
       }
-      setIsLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
+  const fetchProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+      
+      if (error) throw error;
+      setProfile(data);
+    } catch (error: any) {
+      console.error('Error fetching profile:', error);
+      toast({
+        title: "Error fetching profile",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const signUp = async (email: string, username: string) => {
     try {
-      console.log("Starting signup process for:", { email, username });
-      
       const { data: existingUsers, error: searchError } = await supabase
         .from('profiles')
         .select('username')
         .eq('username', username)
         .single();
 
-      if (searchError && searchError.code !== 'PGRST116') {
-        console.error("Error checking existing username:", searchError);
-        throw new Error("Error checking username availability");
-      }
-
       if (existingUsers) {
         throw new Error("Username already taken");
       }
 
-      // For testing: Use direct login instead of email verification
-      const { data, error: sessionError } = await supabase.rpc('create_test_session', {
+      const { data, error } = await supabase.rpc('create_test_session', {
         user_email: email
       });
 
-      if (sessionError) {
-        console.error("Session creation error:", sessionError);
-        throw sessionError;
-      }
+      if (error) throw error;
 
-      console.log("Direct login successful:", data);
-      
       toast({
         title: "Welcome aboard!",
         description: "You're now signed in and ready to play!",
       });
     } catch (error: any) {
-      console.error("Signup process error:", error);
-      toast({
-        title: "Oops! Something went wrong",
-        description: error.message || "Error creating account",
-        variant: "destructive",
-      });
+      console.error("Signup error:", error);
+      throw error;
     }
   };
 
   const signIn = async (email: string) => {
     try {
-      // For testing: Use direct login instead of magic link
       const { data, error } = await supabase.rpc('create_test_session', {
         user_email: email
       });
@@ -149,17 +130,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         description: "You're now signed in and ready to play!",
       });
     } catch (error: any) {
-      toast({
-        title: "Oops! Something went wrong",
-        description: error.message,
-        variant: "destructive",
-      });
+      console.error("Sign in error:", error);
+      throw error;
     }
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      setGuestName(null);
+    } catch (error: any) {
       toast({
         title: "Error signing out",
         description: error.message,
