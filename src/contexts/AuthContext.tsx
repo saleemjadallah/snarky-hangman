@@ -43,30 +43,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [guestName, setGuestName] = useState<string | null>(null);
   const { toast } = useToast();
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id);
-      } else {
-        setIsLoading(false);
-      }
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event, session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        await fetchProfile(session.user.id);
-      } else {
-        setProfile(null);
-        setIsLoading(false);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
   const fetchProfile = async (userId: string) => {
     try {
       const { data, error } = await supabase
@@ -84,12 +60,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         description: error.message,
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
+  useEffect(() => {
+    // Initial session check
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("Initial session check:", session);
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      }
+      setIsLoading(false);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event, session);
+      
+      if (session?.user) {
+        setUser(session.user);
+        await fetchProfile(session.user.id);
+      } else {
+        setUser(null);
+        setProfile(null);
+      }
+      
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   const signUp = async (email: string, username: string) => {
+    setIsLoading(true);
     try {
       const { data: existingUsers, error: searchError } = await supabase
         .from('profiles')
@@ -113,11 +117,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
     } catch (error: any) {
       console.error("Signup error:", error);
+      setIsLoading(false);
       throw error;
     }
   };
 
   const signIn = async (email: string) => {
+    setIsLoading(true);
     try {
       const { data, error } = await supabase.rpc('create_test_session', {
         user_email: email
@@ -131,36 +137,51 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
     } catch (error: any) {
       console.error("Sign in error:", error);
+      setIsLoading(false);
       throw error;
     }
   };
 
   const signOut = async () => {
+    setIsLoading(true);
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       setGuestName(null);
+      setUser(null);
+      setProfile(null);
     } catch (error: any) {
       toast({
         title: "Error signing out",
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  const contextValue = {
+    user,
+    profile,
+    isLoading,
+    signUp,
+    signIn,
+    signOut,
+    setGuestName,
+    isGuest: !user && !!guestName,
+    guestName
+  };
+
+  console.log("Auth context state:", {
+    user: !!user,
+    profile: !!profile,
+    isLoading,
+    isGuest: !user && !!guestName
+  });
+
   return (
-    <AuthContext.Provider value={{
-      user,
-      profile,
-      isLoading,
-      signUp,
-      signIn,
-      signOut,
-      setGuestName,
-      isGuest: !user && !!guestName,
-      guestName
-    }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );
