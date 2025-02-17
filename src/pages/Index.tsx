@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { GameBoard } from "@/components/GameBoard";
 import { DifficultySelector } from "@/components/DifficultySelector";
@@ -14,6 +13,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
+  console.log('Index component mounting'); // Debug log
+
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
   const [score, setScore] = useState(0);
@@ -22,10 +23,8 @@ const Index = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!user && !isGuest) {
-      setShowRegistration(true);
-    }
-  }, [user, isGuest]);
+    console.log('Auth state:', { user, profile, isGuest }); // Debug log
+  }, [user, profile, isGuest]);
 
   const getRandomWord = async (difficulty: Difficulty) => {
     try {
@@ -93,36 +92,48 @@ const Index = () => {
 
   return (
     <div className="min-h-screen w-full bg-background">
-      {/* Header */}
-      <header className="fixed top-0 left-0 w-full h-16 bg-white border-b border-border z-50 px-4">
-        <div className="max-w-7xl mx-auto h-full flex justify-between items-center">
+      {/* Debug overlay */}
+      <div className="fixed top-0 left-0 z-[9999] bg-black/10 text-xs p-1">
+        Debug: Index Rendered | Auth: {user ? 'Logged In' : 'Not Logged In'}
+      </div>
+
+      {/* Header with debug borders */}
+      <header className="fixed top-0 left-0 w-full h-16 bg-white border-b border-border z-50 px-4 debug-border">
+        <div className="max-w-7xl mx-auto h-full flex justify-between items-center debug-border">
           {/* Logo */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 debug-border">
             <Logo />
           </div>
 
-          {/* Right section with profile and leaderboard */}
-          <div className="flex items-center gap-6">
-            {user && (
-              <div className="relative flex items-center">
-                <Leaderboard />
-              </div>
-            )}
-            {user ? (
-              <div className="relative flex items-center">
-                <ProfileMenu />
-              </div>
-            ) : isGuest ? (
-              <div className="flex items-center gap-4">
-                <span className="text-sm font-medium text-foreground">
-                  Playing as guest: {displayName}
-                </span>
-                <Button variant="ghost" size="sm" onClick={signOut}>
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign Out
-                </Button>
-              </div>
-            ) : null}
+          {/* Right section with profile and leaderboard - with debug styles */}
+          <div className="flex items-center gap-6 debug-border" style={{ minWidth: '200px' }}>
+            {/* Always render icons container for debugging */}
+            <div className="flex items-center gap-4 debug-border" style={{ minHeight: '40px' }}>
+              {console.log('Rendering header icons, user:', !!user)} {/* Debug log */}
+              {user && (
+                <>
+                  <div className="relative flex items-center debug-border" style={{ minWidth: '40px', minHeight: '40px' }}>
+                    {console.log('Rendering Leaderboard')} {/* Debug log */}
+                    <Leaderboard />
+                  </div>
+                  <div className="relative flex items-center debug-border" style={{ minWidth: '40px', minHeight: '40px' }}>
+                    {console.log('Rendering ProfileMenu')} {/* Debug log */}
+                    <ProfileMenu />
+                  </div>
+                </>
+              )}
+              {!user && isGuest && (
+                <div className="flex items-center gap-4 debug-border">
+                  <span className="text-sm font-medium text-foreground">
+                    Playing as guest: {displayName}
+                  </span>
+                  <Button variant="ghost" size="sm" onClick={signOut}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -178,6 +189,12 @@ const Index = () => {
         isOpen={showRegistration}
         onClose={() => setShowRegistration(false)}
       />
+
+      <style jsx global>{`
+        .debug-border {
+          border: 1px dashed rgba(255, 0, 0, 0.2) !important;
+        }
+      `}</style>
     </div>
   );
 };
