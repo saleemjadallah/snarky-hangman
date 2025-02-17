@@ -18,7 +18,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const data = await AuthService.fetchProfile(userId);
       if (data) {
-        console.log("Profile fetched:", data); // Debug log
+        console.log("Profile fetched:", data);
         setProfile(data);
       }
     } catch (error: any) {
@@ -69,22 +69,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       const { data, error } = await AuthService.createTestSession(email);
-      if (error) {
-        // Check if the error indicates the email already exists
-        if (error.message?.includes('already exists')) {
-          throw new Error("This email is already registered. Please sign in instead.");
-        }
-        throw error;
-      }
+      if (error) throw error;
 
-      // Wait a moment for the trigger to create the profile
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Fetch the session to get the user
-      const { data: { session } } = await AuthService.getCurrentSession();
-      if (session?.user) {
-        await AuthService.updateUsername(session.user.id, username);
-        await fetchProfile(session.user.id);
+      // If we have a session, update the username and fetch profile
+      if (data.session?.user) {
+        await AuthService.updateUsername(data.session.user.id, username);
+        setUser(data.session.user);
+        await fetchProfile(data.session.user.id);
       }
 
       toast({
@@ -107,22 +98,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signIn = async (email: string) => {
     setIsLoading(true);
     try {
-      const { error } = await AuthService.createTestSession(email);
+      const { data, error } = await AuthService.createTestSession(email);
       if (error) throw error;
 
-      // Wait a moment for the session to be created
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      const { data: { session } } = await AuthService.getCurrentSession();
-      if (session?.user) {
-        console.log("Sign in successful, fetching profile for user:", session.user.id);
-        await fetchProfile(session.user.id);
+      // If we have a session, update the state immediately
+      if (data.session?.user) {
+        setUser(data.session.user);
+        await fetchProfile(data.session.user.id);
+        
+        toast({
+          title: "Welcome back!",
+          description: "You're now signed in and ready to play!",
+        });
+      } else {
+        throw new Error("Auth session missing!");
       }
-      
-      toast({
-        title: "Welcome back!",
-        description: "You're now signed in and ready to play!",
-      });
     } catch (error: any) {
       console.error("Sign in error:", error);
       toast({
