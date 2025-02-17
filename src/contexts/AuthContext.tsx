@@ -17,7 +17,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const fetchProfile = async (userId: string) => {
     try {
       const data = await AuthService.fetchProfile(userId);
-      if (data) setProfile(data);
+      if (data) {
+        console.log("Profile fetched:", data); // Debug log
+        setProfile(data);
+      }
     } catch (error: any) {
       console.error('Error fetching profile:', error);
       toast({
@@ -112,6 +115,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const { data: { session } } = await AuthService.getCurrentSession();
       if (session?.user) {
+        console.log("Sign in successful, fetching profile for user:", session.user.id);
         await fetchProfile(session.user.id);
       }
       
