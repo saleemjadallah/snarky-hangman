@@ -2,13 +2,20 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Profile } from "@/types/auth";
 
+interface TestSessionResponse {
+  user_id: string;
+  email: string;
+}
+
 export async function signUp(email: string, username: string) {
   // First create the test session with just email
-  const { data: sessionData, error: sessionError } = await supabase.rpc('create_test_session', {
+  const { data: sessionData, error: sessionError } = await supabase.rpc<TestSessionResponse>('create_test_session', {
     user_email: email
   });
   
   if (sessionError) throw sessionError;
+  if (!sessionData) throw new Error('No session data returned');
+  
   console.log("Test session created:", sessionData);
 
   // Wait for the database trigger to complete
@@ -31,11 +38,13 @@ export async function signUp(email: string, username: string) {
 
 export async function signIn(email: string) {
   // Create test session for existing user
-  const { data: sessionData, error: sessionError } = await supabase.rpc('create_test_session', {
+  const { data: sessionData, error: sessionError } = await supabase.rpc<TestSessionResponse>('create_test_session', {
     user_email: email
   });
   
   if (sessionError) throw sessionError;
+  if (!sessionData) throw new Error('No session data returned');
+  
   console.log("Test session created:", sessionData);
 
   // Wait for the database trigger to complete
