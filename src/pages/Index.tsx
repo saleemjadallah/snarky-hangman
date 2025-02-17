@@ -90,7 +90,7 @@ const Index = () => {
           difficulty: difficulty,
           word_category: currentWord?.category,
           score: gameScore,
-          wrong_guesses: won ? 0 : 6, // Adjust based on actual wrong guesses
+          wrong_guesses: won ? 0 : 6,
           perfect_game: won,
           abandoned: !won
         });
@@ -102,8 +102,9 @@ const Index = () => {
         setScore((prev) => prev + gameScore);
       }
 
-      // Clear current word to show play again button
+      // Clear current word and difficulty to show difficulty selector
       setCurrentWord(null);
+      setDifficulty(null);
 
       // Invalidate leaderboard cache to force refresh
       await supabase.rpc('maintain_word_pools');
@@ -185,21 +186,30 @@ const Index = () => {
           {!difficulty && <DifficultySelector onSelect={handleDifficultySelect} />}
 
           {difficulty && !currentWord && (
-            <div className="flex justify-center">
+            <div className="flex flex-col items-center gap-4">
               {isLoading ? (
                 <Button disabled className="btn-hover" size="lg">
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Loading...
                 </Button>
               ) : (
-                <Button
-                  onClick={handlePlayAgain}
-                  className="btn-hover"
-                  size="lg"
-                >
-                  <RotateCw className="mr-2 h-4 w-4" />
-                  Play Again
-                </Button>
+                <>
+                  <Button
+                    onClick={handlePlayAgain}
+                    className="btn-hover"
+                    size="lg"
+                  >
+                    <RotateCw className="mr-2 h-4 w-4" />
+                    Play Again (Same Difficulty)
+                  </Button>
+                  <Button
+                    onClick={() => setDifficulty(null)}
+                    variant="outline"
+                    size="lg"
+                  >
+                    Change Difficulty
+                  </Button>
+                </>
               )}
             </div>
           )}
