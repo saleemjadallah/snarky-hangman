@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { GameBoard } from "@/components/GameBoard";
 import { DifficultySelector } from "@/components/DifficultySelector";
@@ -90,6 +91,22 @@ const Index = () => {
 
   const displayName = profile?.username || guestName || "Player";
 
+  // Debug logs moved outside JSX
+  const logHeaderIcons = () => {
+    console.log('Rendering header icons, user:', !!user);
+  };
+
+  const logLeaderboard = () => {
+    console.log('Rendering Leaderboard');
+  };
+
+  const logProfileMenu = () => {
+    console.log('Rendering ProfileMenu');
+  };
+
+  // Call the logging function once per render
+  logHeaderIcons();
+
   return (
     <div className="min-h-screen w-full bg-background">
       {/* Debug overlay */}
@@ -109,19 +126,20 @@ const Index = () => {
           <div className="flex items-center gap-6 debug-border" style={{ minWidth: '200px' }}>
             {/* Always render icons container for debugging */}
             <div className="flex items-center gap-4 debug-border" style={{ minHeight: '40px' }}>
-              {console.log('Rendering header icons, user:', !!user)} {/* Debug log */}
-              {user && (
-                <>
-                  <div className="relative flex items-center debug-border" style={{ minWidth: '40px', minHeight: '40px' }}>
-                    {console.log('Rendering Leaderboard')} {/* Debug log */}
-                    <Leaderboard />
-                  </div>
-                  <div className="relative flex items-center debug-border" style={{ minWidth: '40px', minHeight: '40px' }}>
-                    {console.log('Rendering ProfileMenu')} {/* Debug log */}
-                    <ProfileMenu />
-                  </div>
-                </>
-              )}
+              {user && (() => {
+                logLeaderboard();
+                logProfileMenu();
+                return (
+                  <>
+                    <div className="relative flex items-center debug-border" style={{ minWidth: '40px', minHeight: '40px' }}>
+                      <Leaderboard />
+                    </div>
+                    <div className="relative flex items-center debug-border" style={{ minWidth: '40px', minHeight: '40px' }}>
+                      <ProfileMenu />
+                    </div>
+                  </>
+                );
+              })()}
               {!user && isGuest && (
                 <div className="flex items-center gap-4 debug-border">
                   <span className="text-sm font-medium text-foreground">
@@ -190,11 +208,13 @@ const Index = () => {
         onClose={() => setShowRegistration(false)}
       />
 
-      <style jsx global>{`
-        .debug-border {
-          border: 1px dashed rgba(255, 0, 0, 0.2) !important;
-        }
-      `}</style>
+      <style>
+        {`
+          .debug-border {
+            border: 1px dashed rgba(255, 0, 0, 0.2) !important;
+          }
+        `}
+      </style>
     </div>
   );
 };
