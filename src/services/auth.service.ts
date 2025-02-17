@@ -24,16 +24,6 @@ export async function checkUsernameAvailability(username: string): Promise<boole
   return !data;
 }
 
-export async function checkEmailExists(email: string): Promise<boolean> {
-  const { count, error } = await supabase
-    .from('profiles')
-    .select('*', { count: 'exact', head: true })
-    .eq('email', email);
-
-  if (error) throw error;
-  return count ? count > 0 : false;
-}
-
 export async function updateUsername(userId: string, username: string): Promise<void> {
   const { error } = await supabase
     .from('profiles')

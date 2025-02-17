@@ -60,19 +60,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signUp = async (email: string, username: string) => {
     setIsLoading(true);
     try {
-      // Check if email already exists
-      const emailExists = await AuthService.checkEmailExists(email);
-      if (emailExists) {
-        throw new Error("This email is already registered. Please sign in instead.");
-      }
-
       const isUsernameAvailable = await AuthService.checkUsernameAvailability(username);
       if (!isUsernameAvailable) {
         throw new Error("Username already taken");
       }
 
       const { data, error } = await AuthService.createTestSession(email);
-      if (error) throw error;
+      if (error) {
+        // Check if the error indicates the email already exists
+        if (error.message?.includes('already exists')) {
+          throw new Error("This email is already registered. Please sign in instead.");
+        }
+        throw error;
+      }
 
       // Wait a moment for the trigger to create the profile
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -104,12 +104,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signIn = async (email: string) => {
     setIsLoading(true);
     try {
-      // Check if email exists before attempting to sign in
-      const emailExists = await AuthService.checkEmailExists(email);
-      if (!emailExists) {
-        throw new Error("Email not found. Please sign up first.");
-      }
-
       const { error } = await AuthService.createTestSession(email);
       if (error) throw error;
 
