@@ -6,27 +6,41 @@ export async function signUp(email: string, username: string) {
   // Generate a simple password for demo purposes (in production, you'd want a proper password field)
   const password = `${email}_${Date.now()}`;
 
-  // First create the actual user account
-  const { data: authData, error: signUpError } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: {
-        username: username // Store username in user metadata
+  try {
+    // First create the actual user account
+    const { data: authData, error: signUpError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          username: username // Store username in user metadata
+        }
       }
+    });
+
+    if (signUpError) {
+      // If user already exists, try to sign in instead
+      if (signUpError.message === "User already registered") {
+        throw new Error("This email is already registered. Please sign in instead.");
+      }
+      throw signUpError;
     }
-  });
 
-  if (signUpError) throw signUpError;
-  if (!authData.user) throw new Error('No user data returned');
+    if (!authData.user) throw new Error('No user data returned');
 
-  // Store the password in localStorage for this demo (NOT recommended for production!)
-  localStorage.setItem(`pwd_${email}`, password);
+    // Store the password in localStorage for this demo (NOT recommended for production!)
+    localStorage.setItem(`pwd_${email}`, password);
 
-  // The profile will be created automatically by our database trigger
-  console.log("User created:", authData);
+    // The profile will be created automatically by our database trigger
+    console.log("User created:", authData);
 
-  return { session: authData.session };
+    return { session: authData.session };
+  } catch (error: any) {
+    if (error.message === "User already registered") {
+      throw new Error("This email is already registered. Please sign in instead.");
+    }
+    throw error;
+  }
 }
 
 export async function signIn(email: string) {
