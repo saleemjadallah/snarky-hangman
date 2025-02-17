@@ -67,6 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event, session);
       setUser(session?.user ?? null);
       if (session?.user) {
         const { data, error } = await supabase
@@ -91,9 +92,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, username: string) => {
     try {
-      const { error } = await supabase.auth.signUp({
+      console.log("Starting signup process for:", { email, username });
+      
+      const { data: existingUsers, error: searchError } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('username', username)
+        .single();
+
+      if (searchError && searchError.code !== 'PGRST116') {
+        console.error("Error checking existing username:", searchError);
+        throw new Error("Error checking username availability");
+      }
+
+      if (existingUsers) {
+        throw new Error("Username already taken");
+      }
+
+      const { data, error } = await supabase.auth.signUp({
         email,
-        password: crypto.randomUUID(), // Generate a random password since we're using magic links
+        password: crypto.randomUUID(),
         options: {
           data: {
             username,
@@ -101,16 +119,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Signup error:", error);
+        throw error;
+      }
+
+      console.log("Signup successful:", data);
       
       toast({
         title: "Welcome aboard!",
         description: "Check your email for the magic link to start playing!",
       });
     } catch (error: any) {
+      console.error("Signup process error:", error);
       toast({
         title: "Oops! Something went wrong",
-        description: error.message,
+        description: error.message || "Error creating account",
         variant: "destructive",
       });
     }
