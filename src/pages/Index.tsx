@@ -92,71 +92,87 @@ const Index = () => {
   const displayName = profile?.username || guestName || "Player";
 
   return (
-    <div className="min-h-screen w-full">
-      <div className="absolute top-4 left-4">
-        <Logo />
-      </div>
-      
-      <div className="absolute top-4 right-4 flex items-center gap-4">
-        {user && <Leaderboard />}
-        {user ? (
-          <ProfileMenu />
-        ) : isGuest ? (
-          <>
-            <span className="text-sm font-medium">
-              Playing as guest: {displayName}
-            </span>
-            <Button variant="ghost" size="sm" onClick={signOut}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
-            </Button>
-          </>
-        ) : null}
-      </div>
-      
-      <div className="px-4 py-8 space-y-8">
-        <div className="text-center space-y-4 mb-8">
-          <h1 className="text-4xl font-bold text-primary">Snarky Hangman</h1>
-          <p className="text-muted-foreground">
-            Can you outsmart the world's most condescending word game?
-          </p>
-          {score > 0 && (
-            <p className="text-lg font-semibold text-secondary">Score: {score}</p>
+    <div className="min-h-screen w-full bg-background">
+      {/* Header */}
+      <header className="fixed top-0 left-0 w-full h-16 bg-white border-b border-border z-50 px-4">
+        <div className="max-w-7xl mx-auto h-full flex justify-between items-center">
+          {/* Logo */}
+          <div className="flex-shrink-0">
+            <Logo />
+          </div>
+
+          {/* Right section with profile and leaderboard */}
+          <div className="flex items-center gap-6">
+            {user && (
+              <div className="relative flex items-center">
+                <Leaderboard />
+              </div>
+            )}
+            {user ? (
+              <div className="relative flex items-center">
+                <ProfileMenu />
+              </div>
+            ) : isGuest ? (
+              <div className="flex items-center gap-4">
+                <span className="text-sm font-medium text-foreground">
+                  Playing as guest: {displayName}
+                </span>
+                <Button variant="ghost" size="sm" onClick={signOut}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </Button>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </header>
+
+      {/* Main content with top padding for header */}
+      <main className="pt-24 px-4 pb-8">
+        <div className="max-w-7xl mx-auto space-y-8">
+          <div className="text-center space-y-4">
+            <h1 className="text-4xl font-bold text-primary">Snarky Hangman</h1>
+            <p className="text-muted-foreground">
+              Can you outsmart the world's most condescending word game?
+            </p>
+            {score > 0 && (
+              <p className="text-lg font-semibold text-secondary">Score: {score}</p>
+            )}
+          </div>
+
+          <div className="max-w-[600px] mx-auto px-6 text-center space-y-4 animate-fade-in">
+            <p className="text-[#2D3748] leading-relaxed text-base sm:text-lg">
+              Think you're a wordsmith? Put your vocabulary to the test against our sarcastically superior AI. Fair warning: our AI has devoured dictionaries for breakfast and takes peculiar joy in watching humans squirm. Choose your difficulty level, pick your avatar, and prepare to be lovingly mocked for every wrong guess. Don't worry though – even if you lose, you'll at least get a good laugh out of it.
+            </p>
+            <p className="text-[#2D3748] font-medium text-base sm:text-lg">
+              Ready to prove you're smarter than a particularly smug algorithm?
+            </p>
+          </div>
+
+          {!difficulty && <DifficultySelector onSelect={handleDifficultySelect} />}
+
+          {difficulty && !currentWord && (
+            <div className="flex justify-center">
+              <Button
+                onClick={handlePlayAgain}
+                className="btn-hover"
+                size="lg"
+              >
+                <RotateCw className="mr-2 h-4 w-4" />
+                Play Again
+              </Button>
+            </div>
+          )}
+
+          {currentWord && (
+            <GameBoard
+              currentWord={currentWord}
+              difficulty={difficulty}
+              onGameEnd={handleGameEnd}
+            />
           )}
         </div>
-
-        <div className="max-w-[600px] mx-auto px-6 text-center space-y-4 animate-fade-in">
-          <p className="text-[#2D3748] leading-relaxed text-base sm:text-lg">
-            Think you're a wordsmith? Put your vocabulary to the test against our sarcastically superior AI. Fair warning: our AI has devoured dictionaries for breakfast and takes peculiar joy in watching humans squirm. Choose your difficulty level, pick your avatar, and prepare to be lovingly mocked for every wrong guess. Don't worry though – even if you lose, you'll at least get a good laugh out of it.
-          </p>
-          <p className="text-[#2D3748] font-medium text-base sm:text-lg">
-            Ready to prove you're smarter than a particularly smug algorithm?
-          </p>
-        </div>
-
-        {!difficulty && <DifficultySelector onSelect={handleDifficultySelect} />}
-
-        {difficulty && !currentWord && (
-          <div className="flex justify-center">
-            <Button
-              onClick={handlePlayAgain}
-              className="btn-hover"
-              size="lg"
-            >
-              <RotateCw className="mr-2 h-4 w-4" />
-              Play Again
-            </Button>
-          </div>
-        )}
-
-        {currentWord && (
-          <GameBoard
-            currentWord={currentWord}
-            difficulty={difficulty}
-            onGameEnd={handleGameEnd}
-          />
-        )}
-      </div>
+      </main>
 
       <RegistrationModal
         isOpen={showRegistration}
@@ -167,4 +183,3 @@ const Index = () => {
 };
 
 export default Index;
-
