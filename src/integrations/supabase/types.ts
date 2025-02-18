@@ -210,24 +210,24 @@ export type Database = {
           total_score: number | null
         }
         Insert: {
-          best_score?: never
+          best_score?: number | null
           easy_games_played?: number | null
           hard_games_played?: number | null
           id?: string | null
           last_played_at?: string | null
           medium_games_played?: number | null
           total_games_played?: never
-          total_score?: never
+          total_score?: number | null
         }
         Update: {
-          best_score?: never
+          best_score?: number | null
           easy_games_played?: number | null
           hard_games_played?: number | null
           id?: string | null
           last_played_at?: string | null
           medium_games_played?: number | null
           total_games_played?: never
-          total_score?: never
+          total_score?: number | null
         }
         Relationships: []
       }
