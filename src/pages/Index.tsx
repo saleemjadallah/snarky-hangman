@@ -35,10 +35,22 @@ const Index = () => {
       const categories = ['animals', 'science', 'arts', 'sports', 'food', 'geography', 'business', 'health'];
       const randomCategory = categories[Math.floor(Math.random() * categories.length)];
 
+      // Ensure we have fresh words in the pool
       await supabase.functions.invoke('generate-words', {
         body: { difficulty, category: randomCategory }
       });
 
+      // Get a random offset for the query to add more randomization
+      const { count } = await supabase
+        .from('word_pool')
+        .select('*', { count: 'exact', head: true })
+        .eq('difficulty', difficulty)
+        .eq('category', randomCategory)
+        .eq('active', true);
+
+      const randomOffset = Math.floor(Math.random() * (count || 1));
+
+      // Fetch a random word using the offset and ordering by a combination of factors
       const { data: words, error } = await supabase
         .from('word_pool')
         .select('word, difficulty, category')
@@ -46,7 +58,9 @@ const Index = () => {
         .eq('category', randomCategory)
         .eq('active', true)
         .order('times_used', { ascending: true })
-        .limit(1);
+        .order('last_used_at', { ascending: true, nullsFirst: true })
+        .limit(1)
+        .range(randomOffset, randomOffset);
 
       if (error) {
         throw error;
