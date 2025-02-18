@@ -42,7 +42,34 @@ export async function fetchProfile(userId: string): Promise<Profile | null> {
     .single();
   
   if (error) throw error;
-  return data;
+  
+  // Ensure all required fields are present with default values if needed
+  if (data) {
+    return {
+      id: data.id,
+      username: data.username,
+      email: data.email,
+      avatar_url: data.avatar_url || null,
+      total_score: data.total_score || 0,
+      best_score: data.best_score || 0,
+      perfect_games: data.perfect_games || 0,
+      current_streak: data.current_streak || 0,
+      longest_streak: data.longest_streak || 0,
+      easy_games_played: data.easy_games_played || 0,
+      medium_games_played: data.medium_games_played || 0,
+      hard_games_played: data.hard_games_played || 0,
+      last_played_at: data.last_played_at || null,
+      last_streak_update: data.last_streak_update || null,
+      created_at: data.created_at,
+      daily_score: data.daily_score,
+      favorite_difficulty: data.favorite_difficulty,
+      hints_used: data.hints_used,
+      updated_at: data.updated_at,
+      weekly_score: data.weekly_score
+    };
+  }
+  
+  return null;
 }
 
 export async function signOut() {
