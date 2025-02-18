@@ -1,3 +1,4 @@
+
 export type Difficulty = 'easy' | 'medium' | 'hard';
 
 export type Category = 'animals' | 'science' | 'arts' | 'sports' | 'food' | 'geography' | 'business' | 'health';

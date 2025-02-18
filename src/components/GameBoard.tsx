@@ -6,6 +6,7 @@ import { Avatar } from "./avatar/Avatar";
 import { WordDisplay } from "./game/WordDisplay";
 import { GameStatus } from "./game/GameStatus";
 import { LetterGrid } from "./game/LetterGrid";
+import { HintSystem } from "./game/HintSystem";
 
 interface GameBoardProps {
   currentWord: Word;
@@ -18,6 +19,7 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
   const [remainingGuesses, setRemainingGuesses] = useState(difficultySettings[difficulty].maxGuesses);
   const [message, setMessage] = useState("");
   const [isGameFinished, setIsGameFinished] = useState(false);
+  const [hintsUsed, setHintsUsed] = useState(0);
   const { toast } = useToast();
 
   const word = currentWord.word.toUpperCase();
@@ -31,6 +33,7 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
     setRemainingGuesses(difficultySettings[difficulty].maxGuesses);
     setMessage("");
     setIsGameFinished(false);
+    setHintsUsed(0);
   }, [currentWord, difficulty]);
 
   useEffect(() => {
@@ -48,7 +51,8 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
     const uniqueLetters = new Set(word).size;
     const wrongGuesses = guessed.filter(letter => !word.includes(letter)).length;
     const baseScore = uniqueLetters * difficultySettings[difficulty].pointsPerLetter;
-    return Math.max(0, baseScore - (wrongGuesses * 5));
+    const hintPenalty = hintsUsed * difficultySettings[difficulty].hintCost;
+    return Math.max(0, baseScore - (wrongGuesses * 5) - hintPenalty);
   };
 
   const handleGuess = (letter: string) => {
@@ -89,6 +93,10 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
     }
   };
 
+  const handleHintUsed = () => {
+    setHintsUsed(prev => prev + 1);
+  };
+
   return (
     <div className="w-full max-w-2xl mx-auto p-6 glass rounded-xl space-y-8">
       <WordDisplay
@@ -104,6 +112,14 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
       <GameStatus
         remainingGuesses={remainingGuesses}
         message={message}
+      />
+
+      <HintSystem
+        difficulty={difficulty}
+        word={word}
+        category={category}
+        guessedLetters={guessedLetters}
+        onHintUsed={handleHintUsed}
       />
 
       <LetterGrid
