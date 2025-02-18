@@ -32,7 +32,7 @@ export const useProfileSync = () => {
               id: updatedProfile.id,
               username: updatedProfile.username,
               email: updatedProfile.email,
-              avatar_url: updatedProfile.avatar_url || null,
+              avatar_url: null, // Set default value for avatar_url since it's not in the database yet
               total_score: updatedProfile.total_score || 0,
               best_score: updatedProfile.best_score || 0,
               perfect_games: updatedProfile.perfect_games || 0,
