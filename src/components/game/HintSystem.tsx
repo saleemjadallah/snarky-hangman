@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Lightbulb, LightbulbOff } from "lucide-react";
@@ -111,9 +110,7 @@ export const HintSystem = ({
       ],
     };
 
-    // Get relevant hints for the category
     const relevantHints = hints[category as Category];
-    // Return a random hint from the relevant set
     return relevantHints[Math.floor(Math.random() * relevantHints.length)];
   };
 
@@ -128,7 +125,6 @@ export const HintSystem = ({
     
     if (unguessedLetters.length === 0) return null;
 
-    // Prioritize vowels and common letters
     const vowels = unguessedLetters.filter(letter => "aeiou".includes(letter.toLowerCase()));
     if (vowels.length > 0) {
       return vowels[Math.floor(Math.random() * vowels.length)];
@@ -143,7 +139,6 @@ export const HintSystem = ({
       return "_";
     }).join(" ");
     
-    // Add additional context based on word length
     const context = word.length <= 4 ? "short word" : 
                    word.length <= 6 ? "medium word" : "long word";
     
@@ -222,25 +217,25 @@ export const HintSystem = ({
             </span>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56">
+        <DropdownMenuContent className="w-56 bg-white dark:bg-gray-800 border shadow-lg">
           <DropdownMenuItem
             onClick={() => useHint("subcategory")}
             disabled={usedHintTypes.has("subcategory")}
-            className="gap-2"
+            className="gap-2 hover:bg-gray-100 dark:hover:bg-gray-700"
           >
             <span>Subcategory Hint</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => useHint("letter")}
             disabled={usedHintTypes.has("letter")}
-            className="gap-2"
+            className="gap-2 hover:bg-gray-100 dark:hover:bg-gray-700"
           >
             <span>Reveal Letter</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => useHint("pattern")}
             disabled={usedHintTypes.has("pattern")}
-            className="gap-2"
+            className="gap-2 hover:bg-gray-100 dark:hover:bg-gray-700"
           >
             <span>Word Pattern</span>
           </DropdownMenuItem>
