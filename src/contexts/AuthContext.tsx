@@ -115,7 +115,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signOut,
       setGuestName,
       isGuest: !user && !!guestName,
-      guestName
+      guestName,
+      setProfile
     }}>
       {children}
     </AuthContext.Provider>

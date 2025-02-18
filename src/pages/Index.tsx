@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { GameBoard } from "@/components/GameBoard";
 import { DifficultySelector } from "@/components/DifficultySelector";
@@ -19,7 +18,7 @@ const Index = () => {
   const [score, setScore] = useState(0);
   const [showRegistration, setShowRegistration] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { user, profile, isGuest, guestName, signOut } = useAuth();
+  const { user, profile, isGuest, guestName, signOut, setProfile } = useAuth();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -30,17 +29,47 @@ const Index = () => {
     }
   }, [user, isGuest, isLoading]);
 
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const channel = supabase
+      .channel('profile-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'profiles',
+          filter: `id=eq.${user.id}`
+        },
+        async (payload) => {
+          const { data: updatedProfile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+            
+          if (updatedProfile) {
+            setProfile(updatedProfile);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id]);
+
   const getRandomWord = async (difficulty: Difficulty) => {
     try {
       const categories = ['animals', 'science', 'arts', 'sports', 'food', 'geography', 'business', 'health'];
       const randomCategory = categories[Math.floor(Math.random() * categories.length)];
 
-      // Ensure we have fresh words in the pool
       await supabase.functions.invoke('generate-words', {
         body: { difficulty, category: randomCategory }
       });
 
-      // Get a random offset for the query to add more randomization
       const { count } = await supabase
         .from('word_pool')
         .select('*', { count: 'exact', head: true })
@@ -50,7 +79,6 @@ const Index = () => {
 
       const randomOffset = Math.floor(Math.random() * (count || 1));
 
-      // Fetch a random word using the offset and ordering by a combination of factors
       const { data: words, error } = await supabase
         .from('word_pool')
         .select('word, difficulty, category')
@@ -82,21 +110,10 @@ const Index = () => {
     }
   };
 
-  const handleDifficultySelect = async (selectedDifficulty: Difficulty) => {
-    setDifficulty(selectedDifficulty);
-    setIsLoading(true);
-    const word = await getRandomWord(selectedDifficulty);
-    setIsLoading(false);
-    if (word) {
-      setCurrentWord(word);
-    }
-  };
-
   const handleGameEnd = async (won: boolean, gameScore: number) => {
     if (!user && !isGuest) return;
 
     try {
-      // Insert game session record
       const { error: sessionError } = await supabase
         .from('game_sessions')
         .insert({
@@ -111,7 +128,6 @@ const Index = () => {
 
       if (sessionError) throw sessionError;
 
-      // Get current profile data
       const { data: currentProfile, error: fetchError } = await supabase
         .from('profiles')
         .select('*')
@@ -120,7 +136,6 @@ const Index = () => {
 
       if (fetchError) throw fetchError;
 
-      // Update both main stats and difficulty-specific stats
       const difficultyColumn = `${difficulty}_games_played`;
       const { error: profileError } = await supabase
         .from('profiles')
@@ -140,18 +155,14 @@ const Index = () => {
 
       if (profileError) throw profileError;
 
-      // Update local score
       if (won) {
         setScore((prev) => prev + gameScore);
       }
 
-      // Clear current word and difficulty to show difficulty selector
       setCurrentWord(null);
       setDifficulty(null);
 
-      // Invalidate leaderboard cache to force refresh
       await supabase.rpc('maintain_word_pools');
-
     } catch (error) {
       console.error('Error updating game stats:', error);
       toast({
@@ -159,6 +170,16 @@ const Index = () => {
         description: "Failed to update game statistics.",
         variant: "destructive"
       });
+    }
+  };
+
+  const handleDifficultySelect = async (selectedDifficulty: Difficulty) => {
+    setDifficulty(selectedDifficulty);
+    setIsLoading(true);
+    const word = await getRandomWord(selectedDifficulty);
+    setIsLoading(false);
+    if (word) {
+      setCurrentWord(word);
     }
   };
 
