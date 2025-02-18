@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
-import type { Difficulty } from "@/lib/game-data";
+import type { Difficulty, Category } from "@/lib/game-data";
 
 interface HintSystemProps {
   difficulty: Difficulty;
@@ -42,6 +42,80 @@ export const HintSystem = ({
     "Fine, I'll give you a tiny peek...",
     "I suppose even Einstein needed help sometimes... not with this though.",
   ];
+
+  const getSubCategoryHint = (category: Category, word: string) => {
+    const hints: Record<Category, string[]> = {
+      animals: [
+        "This creature is a mammal",
+        "This is a sea creature",
+        "This animal flies",
+        "This is a domesticated animal",
+        "This is a wild animal",
+        "This creature is a reptile",
+      ],
+      science: [
+        "This is a scientific process",
+        "This is a scientific instrument",
+        "This is a chemical element",
+        "This is a scientific theory",
+        "This relates to astronomy",
+        "This is a biological term",
+      ],
+      arts: [
+        "This is an art movement",
+        "This is an artistic technique",
+        "This relates to music",
+        "This is a type of performance",
+        "This is a famous artwork",
+        "This is an artistic tool",
+      ],
+      sports: [
+        "This is team sport equipment",
+        "This is an individual sport",
+        "This is a sports position",
+        "This is a sporting technique",
+        "This is a sports venue",
+        "This is a sports rule term",
+      ],
+      food: [
+        "This is a type of cuisine",
+        "This is a cooking method",
+        "This is a kitchen utensil",
+        "This is a type of ingredient",
+        "This is a dish type",
+        "This is a spice or seasoning",
+      ],
+      geography: [
+        "This is a landform",
+        "This is a type of climate",
+        "This relates to water bodies",
+        "This is a geographic region",
+        "This is a geographic term",
+        "This relates to map features",
+      ],
+      business: [
+        "This is a financial term",
+        "This is a business role",
+        "This is a type of transaction",
+        "This is a business strategy",
+        "This is an economic concept",
+        "This is a market term",
+      ],
+      health: [
+        "This is a medical condition",
+        "This is a body part",
+        "This is a medical procedure",
+        "This is a health practice",
+        "This is medical equipment",
+        "This is a wellness term",
+      ],
+    };
+
+    // Get relevant hints for the category
+    const relevantHints = hints[category as Category];
+    // Return a random hint from the relevant set
+    return relevantHints[Math.floor(Math.random() * relevantHints.length)];
+  };
 
   const getRandomSnarkyResponse = () => {
     return snarkyResponses[Math.floor(Math.random() * snarkyResponses.length)];
@@ -97,8 +171,8 @@ export const HintSystem = ({
 
     let hintContent = "";
     switch (hintType) {
-      case "category":
-        hintContent = `Category: ${category}`;
+      case "subcategory":
+        hintContent = getSubCategoryHint(category as Category, word);
         break;
       case "letter":
         const letterHint = getLetterHint();
@@ -150,11 +224,11 @@ export const HintSystem = ({
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56">
           <DropdownMenuItem
-            onClick={() => useHint("category")}
-            disabled={usedHintTypes.has("category")}
+            onClick={() => useHint("subcategory")}
+            disabled={usedHintTypes.has("subcategory")}
             className="gap-2"
           >
-            <span>Category Hint</span>
+            <span>Subcategory Hint</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => useHint("letter")}
