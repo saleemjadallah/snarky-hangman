@@ -97,15 +97,30 @@ const Index = () => {
 
       if (sessionError) throw sessionError;
 
-      // Update games played count based on difficulty
+      // Get current profile data
+      const { data: currentProfile, error: fetchError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user?.id)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      // Update both main stats and difficulty-specific stats
       const difficultyColumn = `${difficulty}_games_played`;
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
-          [difficultyColumn]: (profile?.[difficultyColumn] || 0) + 1,
-          total_score: (profile?.total_score || 0) + (won ? gameScore : 0),
-          best_score: won ? Math.max(profile?.best_score || 0, gameScore) : profile?.best_score || 0,
-          last_played_at: new Date().toISOString()
+          [difficultyColumn]: (currentProfile?.[difficultyColumn] || 0) + 1,
+          total_score: (currentProfile?.total_score || 0) + (won ? gameScore : 0),
+          best_score: won ? Math.max(currentProfile?.best_score || 0, gameScore) : currentProfile?.best_score || 0,
+          perfect_games: currentProfile?.perfect_games + (won ? 1 : 0),
+          current_streak: won ? (currentProfile?.current_streak || 0) + 1 : 0,
+          longest_streak: won ? 
+            Math.max(currentProfile?.longest_streak || 0, (currentProfile?.current_streak || 0) + 1) : 
+            currentProfile?.longest_streak || 0,
+          last_played_at: new Date().toISOString(),
+          last_streak_update: new Date().toISOString()
         })
         .eq('id', user?.id);
 
