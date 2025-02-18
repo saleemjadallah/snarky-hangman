@@ -3,13 +3,12 @@ import { useState, useEffect } from "react";
 import { GameBoard } from "@/components/GameBoard";
 import { DifficultySelector } from "@/components/DifficultySelector";
 import { type Difficulty, type Word } from "@/lib/game-data";
-import { Button } from "@/components/ui/button";
-import { RotateCw, LogOut, Loader2 } from "lucide-react";
-import { Logo } from "@/components/Logo";
+import { Header } from "@/components/layout/Header";
+import { IntroSection } from "@/components/game/IntroSection";
+import { GameControls } from "@/components/game/GameControls";
 import { RegistrationModal } from "@/components/RegistrationModal";
 import { useAuth } from "@/contexts/AuthContext";
-import { ProfileMenu } from "@/components/ProfileMenu";
-import { Leaderboard } from "@/components/Leaderboard";
+import { useProfileSync } from "@/hooks/use-profile-sync";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -19,8 +18,11 @@ const Index = () => {
   const [score, setScore] = useState(0);
   const [showRegistration, setShowRegistration] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { user, profile, isGuest, guestName, signOut, setProfile } = useAuth();
+  const { user, isGuest } = useAuth();
   const { toast } = useToast();
+
+  // Use the profile sync hook
+  useProfileSync();
 
   useEffect(() => {
     if (!user && !isGuest && !isLoading) {
@@ -29,59 +31,6 @@ const Index = () => {
       setShowRegistration(false);
     }
   }, [user, isGuest, isLoading]);
-
-  useEffect(() => {
-    if (!user?.id) return;
-
-    const channel = supabase
-      .channel('profile-updates')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'profiles',
-          filter: `id=eq.${user.id}`
-        },
-        async (payload) => {
-          const { data: updatedProfile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', user.id)
-            .single();
-            
-          if (updatedProfile) {
-            setProfile({
-              id: updatedProfile.id,
-              username: updatedProfile.username,
-              email: updatedProfile.email,
-              avatar_url: updatedProfile.avatar_url || null,
-              total_score: updatedProfile.total_score || 0,
-              best_score: updatedProfile.best_score || 0,
-              perfect_games: updatedProfile.perfect_games || 0,
-              current_streak: updatedProfile.current_streak || 0,
-              longest_streak: updatedProfile.longest_streak || 0,
-              easy_games_played: updatedProfile.easy_games_played || 0,
-              medium_games_played: updatedProfile.medium_games_played || 0,
-              hard_games_played: updatedProfile.hard_games_played || 0,
-              last_played_at: updatedProfile.last_played_at || null,
-              last_streak_update: updatedProfile.last_streak_update || null,
-              created_at: updatedProfile.created_at,
-              daily_score: updatedProfile.daily_score,
-              favorite_difficulty: updatedProfile.favorite_difficulty,
-              hints_used: updatedProfile.hints_used,
-              updated_at: updatedProfile.updated_at,
-              weekly_score: updatedProfile.weekly_score
-            });
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user?.id]);
 
   const getRandomWord = async (difficulty: Difficulty) => {
     try {
@@ -216,88 +165,22 @@ const Index = () => {
     }
   };
 
-  const displayName = profile?.username || guestName || "Player";
-
   return (
     <div className="min-h-screen w-full bg-background">
-      <header className="fixed top-0 left-0 w-full h-16 bg-white border-b border-border z-50 px-4">
-        <div className="max-w-7xl mx-auto h-full flex justify-between items-center">
-          <div className="flex-shrink-0">
-            <Logo />
-          </div>
-
-          <div className="flex items-center gap-6">
-            <div className="relative flex items-center">
-              <Leaderboard />
-            </div>
-            <div className="relative flex items-center">
-              <ProfileMenu />
-            </div>
-            {!user && isGuest && (
-              <div className="flex items-center gap-4">
-                <span className="text-sm font-medium text-foreground">
-                  Playing as guest: {displayName}
-                </span>
-                <Button variant="ghost" size="sm" onClick={signOut}>
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign Out
-                </Button>
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <main className="pt-24 px-4 pb-8">
         <div className="max-w-7xl mx-auto space-y-8">
-          <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold text-primary">Snarky Hangman</h1>
-            <p className="text-muted-foreground">
-              Can you outsmart the world's most condescending word game?
-            </p>
-            {score > 0 && (
-              <p className="text-lg font-semibold text-secondary">Score: {score}</p>
-            )}
-          </div>
-
-          <div className="max-w-[600px] mx-auto px-6 text-center space-y-4 animate-fade-in">
-            <p className="text-[#2D3748] leading-relaxed text-base sm:text-lg">
-              Think you're a wordsmith? Put your vocabulary to the test against our sarcastically superior AI. Fair warning: our AI has devoured dictionaries for breakfast and takes peculiar joy in watching humans squirm. Choose your difficulty level, pick your avatar, and prepare to be lovingly mocked for every wrong guess. Don't worry though – even if you lose, you'll at least get a good laugh out of it.
-            </p>
-            <p className="text-[#2D3748] font-medium text-base sm:text-lg">
-              Ready to prove you're smarter than a particularly smug algorithm?
-            </p>
-          </div>
+          <IntroSection score={score} />
 
           {!difficulty && <DifficultySelector onSelect={handleDifficultySelect} />}
 
           {difficulty && !currentWord && (
-            <div className="flex flex-col items-center gap-4">
-              {isLoading ? (
-                <Button disabled className="btn-hover" size="lg">
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Loading...
-                </Button>
-              ) : (
-                <>
-                  <Button
-                    onClick={handlePlayAgain}
-                    className="btn-hover"
-                    size="lg"
-                  >
-                    <RotateCw className="mr-2 h-4 w-4" />
-                    Play Again (Same Difficulty)
-                  </Button>
-                  <Button
-                    onClick={() => setDifficulty(null)}
-                    variant="outline"
-                    size="lg"
-                  >
-                    Change Difficulty
-                  </Button>
-                </>
-              )}
-            </div>
+            <GameControls
+              isLoading={isLoading}
+              onPlayAgain={handlePlayAgain}
+              onChangeDifficulty={() => setDifficulty(null)}
+            />
           )}
 
           {currentWord && (
