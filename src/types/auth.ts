@@ -4,20 +4,17 @@ import { User } from "@supabase/supabase-js";
 export interface Profile {
   id: string;
   username: string;
-  email: string;
+  avatar_url: string | null;
   total_score: number;
   best_score: number;
-  last_played_at: string | null;
+  perfect_games: number;
+  current_streak: number;
+  longest_streak: number;
   easy_games_played: number;
   medium_games_played: number;
   hard_games_played: number;
-  current_streak: number;
-  longest_streak: number;
-  perfect_games: number;
-  hints_used: number;
-  favorite_difficulty: string | null;
-  weekly_score: number;
-  daily_score: number;
+  last_played_at: string | null;
+  last_streak_update: string | null;
 }
 
 export interface AuthContextType {
@@ -27,7 +24,8 @@ export interface AuthContextType {
   signUp: (email: string, username: string) => Promise<void>;
   signIn: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
-  setGuestName: (name: string) => void;
+  setGuestName: (name: string | null) => void;
   isGuest: boolean;
   guestName: string | null;
+  setProfile: (profile: Profile | null) => void;
 }
