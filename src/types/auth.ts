@@ -4,6 +4,7 @@ import { User } from "@supabase/supabase-js";
 export interface Profile {
   id: string;
   username: string;
+  email: string;
   avatar_url: string | null;
   total_score: number;
   best_score: number;
@@ -15,6 +16,12 @@ export interface Profile {
   hard_games_played: number;
   last_played_at: string | null;
   last_streak_update: string | null;
+  created_at?: string;
+  daily_score?: number;
+  favorite_difficulty?: string;
+  hints_used?: number;
+  updated_at?: string;
+  weekly_score?: number;
 }
 
 export interface AuthContextType {
