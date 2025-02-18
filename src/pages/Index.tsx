@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { GameBoard } from "@/components/GameBoard";
 import { DifficultySelector } from "@/components/DifficultySelector";
@@ -50,7 +51,28 @@ const Index = () => {
             .single();
             
           if (updatedProfile) {
-            setProfile(updatedProfile);
+            setProfile({
+              id: updatedProfile.id,
+              username: updatedProfile.username,
+              email: updatedProfile.email,
+              avatar_url: updatedProfile.avatar_url || null,
+              total_score: updatedProfile.total_score || 0,
+              best_score: updatedProfile.best_score || 0,
+              perfect_games: updatedProfile.perfect_games || 0,
+              current_streak: updatedProfile.current_streak || 0,
+              longest_streak: updatedProfile.longest_streak || 0,
+              easy_games_played: updatedProfile.easy_games_played || 0,
+              medium_games_played: updatedProfile.medium_games_played || 0,
+              hard_games_played: updatedProfile.hard_games_played || 0,
+              last_played_at: updatedProfile.last_played_at || null,
+              last_streak_update: updatedProfile.last_streak_update || null,
+              created_at: updatedProfile.created_at,
+              daily_score: updatedProfile.daily_score,
+              favorite_difficulty: updatedProfile.favorite_difficulty,
+              hints_used: updatedProfile.hints_used,
+              updated_at: updatedProfile.updated_at,
+              weekly_score: updatedProfile.weekly_score
+            });
           }
         }
       )
