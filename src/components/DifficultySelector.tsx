@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { difficultySettings } from "@/lib/game-data";
 import type { Difficulty } from "@/lib/game-data";
 import { Brain, Coffee, GraduationCap } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, type TargetAndTransition } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import "@fontsource/poppins/400.css";
 import "@fontsource/poppins/500.css";
@@ -45,7 +45,7 @@ const DifficultyCard = ({
   guesses: number;
   icon: typeof Brain;
   borderColor: string;
-  hoverAnimation: object;
+  hoverAnimation: TargetAndTransition;
 }) => {
   const { toast } = useToast();
 
@@ -130,7 +130,7 @@ export const DifficultySelector = ({ onSelect }: DifficultySelectorProps) => {
           icon={Coffee}
           borderColor="border-orange-100 hover:border-orange-300"
           hoverAnimation={{
-            scale: [1, 1.02, 1],
+            scale: 1.02,
             transition: { duration: 0.5 }
           }}
         />
