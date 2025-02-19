@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { GameBoard } from "@/components/GameBoard";
 import { DifficultySelector } from "@/components/DifficultySelector";
@@ -11,16 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useProfileSync } from "@/hooks/use-profile-sync";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-
-interface Challenge {
-  id: string;
-  word: string;
-  difficulty: Difficulty;
-  score: number;
-  time_remaining: number;
-  hints_used: number;
-  creator_id: string;
-}
+import type { Challenge } from "@/types/database";
 
 const Index = () => {
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);

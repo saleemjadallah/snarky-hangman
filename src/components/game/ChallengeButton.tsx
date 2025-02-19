@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import type { Challenge } from "@/types/database";
 
 interface ChallengeButtonProps {
   word: string;
@@ -30,7 +31,7 @@ export const ChallengeButton = ({ word, score, difficulty, timeRemaining, hintsU
           score,
           time_remaining: timeRemaining,
           hints_used: hintsUsed
-        })
+        } as Challenge)
         .select()
         .single();
 
