@@ -19,7 +19,7 @@ export const IntroSection = ({ score }: IntroSectionProps) => {
       </div>
 
       <div className="max-w-[600px] mx-auto px-6 text-center space-y-2 animate-fade-in">
-        <div className="flex flex-col items-center gap-3 mt-4">
+        <div className="flex flex-col items-center gap-2 mt-4">
           <SpeechBubble 
             message="Think you're a wordsmith? Let's see how you handle my carefully curated collection of confounding vocabulary."
             className="self-start ml-8"
@@ -27,10 +27,6 @@ export const IntroSection = ({ score }: IntroSectionProps) => {
           <SpeechBubble 
             message="I've devoured dictionaries for breakfast and take peculiar joy in watching humans squirm."
             className="self-end mr-8"
-          />
-          <SpeechBubble 
-            message="Choose your difficulty level, pick your avatar, and prepare to be lovingly mocked for every wrong guess."
-            className="self-start ml-8"
           />
           <SpeechBubble 
             message="Don't worry though – even if you lose, you'll at least get a good laugh out of it."
