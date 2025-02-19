@@ -1,3 +1,4 @@
+
 import { Category } from "@/lib/game-data";
 
 const categoryHints: Record<Category, string[]> = {
