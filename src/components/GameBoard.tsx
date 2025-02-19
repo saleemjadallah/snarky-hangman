@@ -76,7 +76,7 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
       toast({
         title: "Tick tock!",
         description: "No time for Google now!",
-        variant: "warning",
+        variant: "default",  // Changed from "warning" to "default"
       });
     } else if (timeRemaining === 10) {
       toast({
