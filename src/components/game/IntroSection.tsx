@@ -1,4 +1,6 @@
 
+import { SpeechBubble } from "@/components/avatar/SpeechBubble";
+
 interface IntroSectionProps {
   score: number;
 }
