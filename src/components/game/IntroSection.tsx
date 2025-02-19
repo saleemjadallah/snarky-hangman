@@ -1,5 +1,6 @@
 
 import { SpeechBubble } from "@/components/avatar/SpeechBubble";
+import { AnimatedTitle } from "@/components/game/AnimatedTitle";
 
 interface IntroSectionProps {
   score: number;
@@ -8,15 +9,11 @@ interface IntroSectionProps {
 export const IntroSection = ({ score }: IntroSectionProps) => {
   return (
     <>
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold text-primary">Snarky Hangman</h1>
-        <p className="text-muted-foreground">
-          Can you outsmart the world's most condescending word game?
-        </p>
-        {score > 0 && (
-          <p className="text-lg font-semibold text-secondary">Score: {score}</p>
-        )}
-      </div>
+      <AnimatedTitle />
+      
+      {score > 0 && (
+        <p className="text-lg font-semibold text-secondary">Score: {score}</p>
+      )}
 
       <div className="max-w-[600px] mx-auto px-6 text-center animate-fade-in">
         <div className="grid grid-cols-2 gap-4 mt-4">
