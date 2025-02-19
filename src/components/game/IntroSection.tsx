@@ -18,23 +18,23 @@ export const IntroSection = ({ score }: IntroSectionProps) => {
         )}
       </div>
 
-      <div className="max-w-[600px] mx-auto px-6 text-center space-y-2 animate-fade-in">
-        <div className="flex flex-col items-center gap-2 mt-4">
+      <div className="max-w-[600px] mx-auto px-6 text-center animate-fade-in">
+        <div className="grid grid-cols-2 gap-4 mt-4">
           <SpeechBubble 
             message="Think you're a wordsmith? Let's see how you handle my carefully curated collection of confounding vocabulary."
-            className="self-start ml-8"
+            className="justify-self-start"
           />
           <SpeechBubble 
             message="I've devoured dictionaries for breakfast and take peculiar joy in watching humans squirm."
-            className="self-end mr-8"
+            className="justify-self-end"
           />
           <SpeechBubble 
             message="Don't worry though – even if you lose, you'll at least get a good laugh out of it."
-            className="self-end mr-8"
+            className="justify-self-start"
           />
           <SpeechBubble 
             message="Ready to prove you're smarter than a particularly smug algorithm?"
-            className="self-center font-semibold"
+            className="justify-self-end"
           />
         </div>
       </div>
