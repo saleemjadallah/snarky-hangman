@@ -12,6 +12,16 @@ import { useProfileSync } from "@/hooks/use-profile-sync";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
+interface Challenge {
+  id: string;
+  word: string;
+  difficulty: Difficulty;
+  score: number;
+  time_remaining: number;
+  hints_used: number;
+  creator_id: string;
+}
+
 const Index = () => {
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
@@ -50,11 +60,12 @@ const Index = () => {
           if (error) throw error;
           
           if (challenge) {
-            setDifficulty(challenge.difficulty as Difficulty);
+            const typedChallenge = challenge as Challenge;
+            setDifficulty(typedChallenge.difficulty);
             setCurrentWord({
-              word: challenge.word,
-              category: 'challenge', // We might want to store category in challenges table
-              difficulty: challenge.difficulty as Difficulty
+              word: typedChallenge.word,
+              category: 'challenge',
+              difficulty: typedChallenge.difficulty
             });
             
             // Clear the challenge ID from URL without refreshing

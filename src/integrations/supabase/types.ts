@@ -36,6 +36,86 @@ export type Database = {
         }
         Relationships: []
       }
+      challenge_attempts: {
+        Row: {
+          challenge_id: string | null
+          completed_at: string | null
+          hints_used: number
+          id: string
+          player_id: string | null
+          score: number
+          status: string | null
+          time_remaining: number
+        }
+        Insert: {
+          challenge_id?: string | null
+          completed_at?: string | null
+          hints_used: number
+          id?: string
+          player_id?: string | null
+          score: number
+          status?: string | null
+          time_remaining: number
+        }
+        Update: {
+          challenge_id?: string | null
+          completed_at?: string | null
+          hints_used?: number
+          id?: string
+          player_id?: string | null
+          score?: number
+          status?: string | null
+          time_remaining?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenge_attempts_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      challenges: {
+        Row: {
+          created_at: string | null
+          creator_id: string | null
+          difficulty: string
+          expires_at: string | null
+          hints_used: number
+          id: string
+          score: number
+          status: string | null
+          time_remaining: number
+          word: string
+        }
+        Insert: {
+          created_at?: string | null
+          creator_id?: string | null
+          difficulty: string
+          expires_at?: string | null
+          hints_used: number
+          id?: string
+          score: number
+          status?: string | null
+          time_remaining: number
+          word: string
+        }
+        Update: {
+          created_at?: string | null
+          creator_id?: string | null
+          difficulty?: string
+          expires_at?: string | null
+          hints_used?: number
+          id?: string
+          score?: number
+          status?: string | null
+          time_remaining?: number
+          word?: string
+        }
+        Relationships: []
+      }
       game_sessions: {
         Row: {
           abandoned: boolean | null
