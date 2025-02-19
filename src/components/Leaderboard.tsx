@@ -10,13 +10,19 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Trophy, Crown, Zap, Medal } from "lucide-react";
+import { Trophy, Crown, Zap, Medal, RefreshCw } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserAvatar } from "./UserAvatar";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface LeaderboardEntry {
   id: string;
@@ -37,7 +43,7 @@ export function Leaderboard() {
   const { user } = useAuth();
   const { toast } = useToast();
 
-  const { data: rankings, isLoading } = useQuery({
+  const { data: rankings, isLoading, refetch: refetchRankings } = useQuery({
     queryKey: ["leaderboard", activeTab],
     enabled: !!user,
     queryFn: async () => {
@@ -65,7 +71,7 @@ export function Leaderboard() {
     },
   });
 
-  const { data: userRank } = useQuery({
+  const { data: userRank, refetch: refetchUserRank } = useQuery({
     queryKey: ["userRank", user?.id],
     enabled: !!user,
     queryFn: async () => {
@@ -93,6 +99,14 @@ export function Leaderboard() {
     },
   });
 
+  const handleRefresh = async () => {
+    await Promise.all([refetchRankings(), refetchUserRank()]);
+    toast({
+      title: "Leaderboard Refreshed",
+      description: "Scores have been updated with the latest data",
+    });
+  };
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -110,11 +124,27 @@ export function Leaderboard() {
         </button>
       </SheetTrigger>
       <SheetContent side="right" className="w-full sm:max-w-xl">
-        <SheetHeader>
+        <SheetHeader className="relative">
           <SheetTitle>Leaderboard</SheetTitle>
           <SheetDescription>
             See how you stack up against other players!
           </SheetDescription>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={handleRefresh}
+                  className="absolute right-0 top-0 p-2 rounded-full hover:bg-muted transition-colors"
+                  aria-label="Refresh Scores"
+                >
+                  <RefreshCw className="h-5 w-5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Refresh Scores</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </SheetHeader>
         
         <Tabs defaultValue="global" className="mt-6" onValueChange={setActiveTab}>
