@@ -20,12 +20,19 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
   const [message, setMessage] = useState("");
   const [isGameFinished, setIsGameFinished] = useState(false);
   const [hintsUsed, setHintsUsed] = useState(0);
+  const [timeRemaining, setTimeRemaining] = useState(() => {
+    switch (difficulty) {
+      case "easy": return 90;
+      case "medium": return 120;
+      case "hard": return 180;
+    }
+  });
   const { toast } = useToast();
 
   const word = currentWord.word.toUpperCase();
   const category = currentWord.category;
   const wrongGuesses = difficultySettings[difficulty].maxGuesses - remainingGuesses;
-  const isGameOver = remainingGuesses === 0 || word.split("").every((letter) => guessedLetters.includes(letter));
+  const isGameOver = remainingGuesses === 0 || timeRemaining <= 0 || word.split("").every((letter) => guessedLetters.includes(letter));
   const gameWon = word.split("").every((letter) => guessedLetters.includes(letter));
 
   useEffect(() => {
@@ -34,7 +41,51 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
     setMessage("");
     setIsGameFinished(false);
     setHintsUsed(0);
+    setTimeRemaining(() => {
+      switch (difficulty) {
+        case "easy": return 90;
+        case "medium": return 120;
+        case "hard": return 180;
+      }
+    });
   }, [currentWord, difficulty]);
+
+  useEffect(() => {
+    if (!isGameFinished && !isGameOver) {
+      const timer = setInterval(() => {
+        setTimeRemaining((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            toast({
+              title: "Time's up!",
+              description: "Maybe try typing faster next time?",
+              variant: "destructive",
+            });
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [isGameFinished, isGameOver]);
+
+  useEffect(() => {
+    if (timeRemaining === 30) {
+      toast({
+        title: "Tick tock!",
+        description: "No time for Google now!",
+        variant: "warning",
+      });
+    } else if (timeRemaining === 10) {
+      toast({
+        title: "Almost out of time!",
+        description: "Hope you're good at quick thinking!",
+        variant: "destructive",
+      });
+    }
+  }, [timeRemaining]);
 
   useEffect(() => {
     if (isGameOver && !isGameFinished) {
@@ -52,7 +103,8 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
     const wrongGuesses = guessed.filter(letter => !word.includes(letter)).length;
     const baseScore = uniqueLetters * difficultySettings[difficulty].pointsPerLetter;
     const hintPenalty = hintsUsed * difficultySettings[difficulty].hintCost;
-    return Math.max(0, baseScore - (wrongGuesses * 5) - hintPenalty);
+    const timeBonus = Math.floor(timeRemaining / 10) * 5;
+    return Math.max(0, baseScore - (wrongGuesses * 5) - hintPenalty + timeBonus);
   };
 
   const handleGuess = (letter: string) => {
@@ -67,6 +119,8 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
       const newRemainingGuesses = remainingGuesses - 1;
       setRemainingGuesses(newRemainingGuesses);
       
+      // Apply time penalty
+      setTimeRemaining(prev => Math.max(30, prev - 5));
       const comment = snarkyComments.badGuess[Math.floor(Math.random() * snarkyComments.badGuess.length)];
       setMessage(comment);
 
@@ -79,6 +133,8 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
         });
       }
     } else {
+      // Add bonus time for correct guess
+      setTimeRemaining(prev => Math.min(prev + 10, getMaxTimeForDifficulty(difficulty)));
       const comment = snarkyComments.goodGuess[Math.floor(Math.random() * snarkyComments.goodGuess.length)];
       setMessage(comment);
 
@@ -93,12 +149,44 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
     }
   };
 
+  const getMaxTimeForDifficulty = (diff: Difficulty) => {
+    switch (diff) {
+      case "easy": return 120;
+      case "medium": return 150;
+      case "hard": return 210;
+    }
+  };
+
   const handleHintUsed = () => {
     setHintsUsed(prev => prev + 1);
+    // Add bonus time for using a hint
+    setTimeRemaining(prev => Math.min(prev + 5, getMaxTimeForDifficulty(difficulty)));
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const getTimerClassName = () => {
+    let className = "timer text-2xl font-bold px-4 py-2 rounded-xl transition-colors duration-300";
+    if (timeRemaining <= 10) {
+      className += " text-red-500 animate-pulse-fast";
+    } else if (timeRemaining <= 30) {
+      className += " text-yellow-500 animate-pulse";
+    }
+    return className;
   };
 
   return (
     <div className="w-full max-w-2xl mx-auto p-6 glass rounded-xl space-y-8">
+      <div className="flex justify-center">
+        <div className={getTimerClassName()}>
+          {formatTime(timeRemaining)}
+        </div>
+      </div>
+
       <WordDisplay
         word={word}
         category={category}
