@@ -59,14 +59,28 @@ export const Logo = ({ className, variant = "dark" }: LogoProps) => {
           strokeLinecap="round"
         />
       </svg>
-      <span 
-        className={cn(
-          "text-xl font-semibold tracking-wide",
-          variant === "light" ? "text-white" : "text-primary"
-        )}
-      >
-        Hangman
-      </span>
+      <div className="flex items-center">
+        <span 
+          className={cn(
+            "text-xl font-black tracking-wide transform -rotate-[15deg] translate-y-1 -translate-x-1",
+            "font-['Permanent_Marker',cursive] text-secondary",
+            "select-none hover:scale-110 transition-transform duration-200"
+          )}
+          style={{
+            textShadow: `1px 1px 0 ${colorScheme.primary}`,
+          }}
+        >
+          Snarky
+        </span>
+        <span 
+          className={cn(
+            "text-xl font-semibold tracking-wide ml-1",
+            variant === "light" ? "text-white" : "text-primary"
+          )}
+        >
+          Hangman
+        </span>
+      </div>
     </Link>
   );
 };
