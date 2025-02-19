@@ -62,7 +62,7 @@ export const Logo = ({ className, variant = "dark" }: LogoProps) => {
       <div className="flex items-center">
         <span 
           className={cn(
-            "text-xl font-black tracking-wide transform -rotate-[15deg] translate-y-1 -translate-x-1",
+            "text-xl font-black tracking-wide transform rotate-[15deg] translate-y-1 -translate-x-1",
             "font-['Permanent_Marker',cursive] text-secondary",
             "select-none hover:scale-110 transition-transform duration-200"
           )}
