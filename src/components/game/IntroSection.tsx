@@ -18,8 +18,8 @@ export const IntroSection = ({ score }: IntroSectionProps) => {
         )}
       </div>
 
-      <div className="max-w-[600px] mx-auto px-6 text-center space-y-4 animate-fade-in">
-        <div className="flex flex-col items-center gap-6 mt-8">
+      <div className="max-w-[600px] mx-auto px-6 text-center space-y-2 animate-fade-in">
+        <div className="flex flex-col items-center gap-3 mt-4">
           <SpeechBubble 
             message="Think you're a wordsmith? Let's see how you handle my carefully curated collection of confounding vocabulary."
             className="self-start ml-8"
