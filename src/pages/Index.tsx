@@ -32,6 +32,55 @@ const Index = () => {
     }
   }, [user, isGuest, isLoading]);
 
+  // Handle challenge parameter in URL
+  useEffect(() => {
+    const loadChallenge = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const challengeId = params.get('challenge');
+      
+      if (challengeId) {
+        try {
+          setIsLoading(true);
+          const { data: challenge, error } = await supabase
+            .from('challenges')
+            .select('*')
+            .eq('id', challengeId)
+            .single();
+
+          if (error) throw error;
+          
+          if (challenge) {
+            setDifficulty(challenge.difficulty as Difficulty);
+            setCurrentWord({
+              word: challenge.word,
+              category: 'challenge', // We might want to store category in challenges table
+              difficulty: challenge.difficulty as Difficulty
+            });
+            
+            // Clear the challenge ID from URL without refreshing
+            window.history.replaceState({}, '', '/');
+            
+            toast({
+              title: "Challenge Accepted!",
+              description: "Show them what you've got!",
+            });
+          }
+        } catch (error) {
+          console.error('Error loading challenge:', error);
+          toast({
+            title: "Error loading challenge",
+            description: "This challenge might have expired or been removed.",
+            variant: "destructive",
+          });
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadChallenge();
+  }, []);
+
   const getRandomWord = async (difficulty: Difficulty) => {
     try {
       const categories = ['animals', 'science', 'arts', 'sports', 'food', 'geography', 'business', 'health'];
