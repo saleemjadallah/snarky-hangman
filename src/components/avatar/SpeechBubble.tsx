@@ -19,7 +19,7 @@ export const SpeechBubble = ({ message, className }: SpeechBubbleProps) => {
         className
       )}
     >
-      <MessageCircle className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 text-white h-6 w-6" />
+      <MessageCircle className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 text-gray-800 h-6 w-6" />
       <p className="text-sm font-medium text-gray-800 text-center">{message}</p>
     </motion.div>
   );
