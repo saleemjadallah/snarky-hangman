@@ -7,6 +7,8 @@ import { WordDisplay } from "./game/WordDisplay";
 import { GameStatus } from "./game/GameStatus";
 import { LetterGrid } from "./game/LetterGrid";
 import { HintSystem } from "./game/HintSystem";
+import { Timer } from "./game/Timer";
+import { calculateScore, getMaxTimeForDifficulty } from "@/utils/scoring";
 
 interface GameBoardProps {
   currentWord: Word;
@@ -51,61 +53,15 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
   }, [currentWord, difficulty]);
 
   useEffect(() => {
-    if (!isGameFinished && !isGameOver) {
-      const timer = setInterval(() => {
-        setTimeRemaining((prev) => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            toast({
-              title: "Time's up!",
-              description: "Maybe try typing faster next time?",
-              variant: "destructive",
-            });
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-
-      return () => clearInterval(timer);
-    }
-  }, [isGameFinished, isGameOver]);
-
-  useEffect(() => {
-    if (timeRemaining === 30) {
-      toast({
-        title: "Tick tock!",
-        description: "No time for Google now!",
-        variant: "default",  // Changed from "warning" to "default"
-      });
-    } else if (timeRemaining === 10) {
-      toast({
-        title: "Almost out of time!",
-        description: "Hope you're good at quick thinking!",
-        variant: "destructive",
-      });
-    }
-  }, [timeRemaining]);
-
-  useEffect(() => {
     if (isGameOver && !isGameFinished) {
       setIsGameFinished(true);
-      const score = gameWon ? calculateScore(guessedLetters, word) : 0;
+      const score = gameWon ? calculateScore(guessedLetters, word, difficulty, hintsUsed, timeRemaining) : 0;
       
       setTimeout(() => {
         onGameEnd(gameWon, score);
       }, 2000);
     }
   }, [isGameOver, isGameFinished]);
-
-  const calculateScore = (guessed: string[], word: string) => {
-    const uniqueLetters = new Set(word).size;
-    const wrongGuesses = guessed.filter(letter => !word.includes(letter)).length;
-    const baseScore = uniqueLetters * difficultySettings[difficulty].pointsPerLetter;
-    const hintPenalty = hintsUsed * difficultySettings[difficulty].hintCost;
-    const timeBonus = Math.floor(timeRemaining / 10) * 5;
-    return Math.max(0, baseScore - (wrongGuesses * 5) - hintPenalty + timeBonus);
-  };
 
   const handleGuess = (letter: string) => {
     if (isGameOver || guessedLetters.includes(letter)) {
@@ -140,20 +96,12 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
 
       if (word.split("").every(l => newGuessedLetters.includes(l))) {
         const winComment = snarkyComments.win[Math.floor(Math.random() * snarkyComments.win.length)];
-        const score = calculateScore(newGuessedLetters, word);
+        const score = calculateScore(newGuessedLetters, word, difficulty, hintsUsed, timeRemaining);
         toast({
           title: "You Won!",
           description: `${winComment} Score: ${score}`,
         });
       }
-    }
-  };
-
-  const getMaxTimeForDifficulty = (diff: Difficulty) => {
-    switch (diff) {
-      case "easy": return 120;
-      case "medium": return 150;
-      case "hard": return 210;
     }
   };
 
@@ -163,29 +111,15 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
     setTimeRemaining(prev => Math.min(prev + 5, getMaxTimeForDifficulty(difficulty)));
   };
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const getTimerClassName = () => {
-    let className = "timer text-2xl font-bold px-4 py-2 rounded-xl transition-colors duration-300";
-    if (timeRemaining <= 10) {
-      className += " text-red-500 animate-pulse-fast";
-    } else if (timeRemaining <= 30) {
-      className += " text-yellow-500 animate-pulse";
-    }
-    return className;
-  };
-
   return (
     <div className="w-full max-w-2xl mx-auto p-6 glass rounded-xl space-y-8">
-      <div className="flex justify-center">
-        <div className={getTimerClassName()}>
-          {formatTime(timeRemaining)}
-        </div>
-      </div>
+      <Timer
+        timeRemaining={timeRemaining}
+        isGameFinished={isGameFinished}
+        isGameOver={isGameOver}
+        onTimeUpdate={setTimeRemaining}
+        difficulty={difficulty}
+      />
 
       <WordDisplay
         word={word}
