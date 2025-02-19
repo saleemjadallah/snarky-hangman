@@ -68,26 +68,6 @@ export const AnimatedTitle = () => {
             </motion.span>
           ))}
         </div>
-        
-        {/* Hanging character from the 'n' in "Hangman" */}
-        <motion.div
-          className="absolute"
-          style={{
-            left: "calc(50% + 1em)", // Adjust based on final positioning
-            bottom: "-1.5em",
-            transformOrigin: "top center"
-          }}
-          animate={{
-            rotate: [-10, 10, -10],
-            transition: {
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }
-          }}
-        >
-          <span className="text-2xl">🎯</span>
-        </motion.div>
       </h1>
 
       {/* Animated Subtitle */}
