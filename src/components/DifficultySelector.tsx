@@ -58,50 +58,52 @@ const DifficultyCard = ({
   };
 
   return (
-    <motion.div
-      whileHover={hoverAnimation}
-      initial={{ scale: 1 }}
-      whileTap={{ scale: 0.95 }}
-      className="w-full"
+    <Button
+      variant="outline"
+      onClick={handleSelect}
+      className={`
+        w-full min-h-[200px] p-6 
+        flex flex-col items-center gap-4 
+        font-poppins rounded-2xl
+        border-2 transition-all duration-300
+        hover:shadow-xl hover:-translate-y-1
+        ${borderColor}
+      `}
+      asChild
     >
-      <Button
-        variant="outline"
-        onClick={handleSelect}
-        className={`
-          w-full min-h-[200px] p-6 
-          flex flex-col items-center gap-4 
-          font-poppins rounded-2xl
-          border-2 transition-all duration-300
-          hover:shadow-xl hover:-translate-y-1
-          ${borderColor}
-        `}
+      <motion.div
+        whileHover={hoverAnimation}
+        initial={{ scale: 1 }}
+        whileTap={{ scale: 0.95 }}
       >
-        <motion.div
-          animate={{ y: [0, -5, 0] }}
-          transition={{ 
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        >
-          <Icon className="w-12 h-12" />
-        </motion.div>
+        <div className="flex flex-col items-center gap-4 w-full">
+          <motion.div
+            animate={{ y: [0, -5, 0] }}
+            transition={{ 
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          >
+            <Icon className="w-12 h-12" />
+          </motion.div>
 
-        <div className="space-y-2 text-center">
-          <h3 className="text-2xl font-bold">{difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}</h3>
-          <p className="text-sm italic text-muted-foreground">
-            {difficultyMessages[difficulty].subtitle}
-          </p>
-          <p className="text-sm font-medium">
-            {guesses} guesses ({
-              difficulty === "easy" ? "we'll be generous" :
-              difficulty === "medium" ? "getting stingier" :
-              "good luck with that"
-            })
-          </p>
+          <div className="space-y-2 text-center">
+            <h3 className="text-2xl font-bold">{difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}</h3>
+            <p className="text-sm italic text-muted-foreground">
+              {difficultyMessages[difficulty].subtitle}
+            </p>
+            <p className="text-sm font-medium">
+              {guesses} guesses ({
+                difficulty === "easy" ? "we'll be generous" :
+                difficulty === "medium" ? "getting stingier" :
+                "good luck with that"
+              })
+            </p>
+          </div>
         </div>
-      </Button>
-    </motion.div>
+      </motion.div>
+    </Button>
   );
 };
 
