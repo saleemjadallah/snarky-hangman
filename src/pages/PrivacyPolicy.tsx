@@ -16,44 +16,170 @@ export default function PrivacyPolicy() {
 
         <div className="space-y-8 text-foreground">
           <div className="space-y-4">
-            <h1 className="text-4xl font-bold">Privacy Policy</h1>
-            <p className="text-sm text-muted-foreground">Last updated: March 14, 2024</p>
+            <h1 className="text-4xl font-bold">Privacy Policy for Snarky Hangman</h1>
+            <p className="text-sm text-muted-foreground">Last updated: February 20, 2025</p>
           </div>
 
           <div className="prose prose-gray max-w-none">
-            <h2>1. Information We Collect</h2>
-            <p>We collect information that you provide directly to us, including when you:</p>
-            <ul>
-              <li>Create an account</li>
-              <li>Play games</li>
-              <li>Communicate with us</li>
-            </ul>
+            <section className="space-y-6">
+              <div>
+                <h2 className="text-2xl font-semibold">1.1. Introduction</h2>
+                <p>Welcome to Snarky Hangman's Privacy Policy. Yes, even a game about guessing words needs one of these. We at MinaZiggy Co LLC take your privacy seriously (even if our AI doesn't take much else seriously).</p>
+              </div>
 
-            <h2>2. How We Use Your Information</h2>
-            <p>We use the information we collect to:</p>
-            <ul>
-              <li>Provide and improve our services</li>
-              <li>Communicate with you</li>
-              <li>Analyze usage patterns</li>
-              <li>Protect against fraud and abuse</li>
-            </ul>
+              <div>
+                <h2 className="text-2xl font-semibold">1.2. Information We Collect</h2>
+                <h3 className="text-xl font-medium mt-4">Information You Give Us</h3>
+                <p>We collect the following information when you play Snarky Hangman:</p>
+                <ul className="list-disc pl-6">
+                  <li>Your name (or whatever clever nickname you choose)</li>
+                  <li>Email address (for account management and to send you virtual high-fives)</li>
+                  <li>Game statistics (because we love data, and our AI needs something to be smug about)</li>
+                  <li>Your victories and defeats (mostly defeats, let's be honest)</li>
+                </ul>
 
-            <h2>3. Information Sharing</h2>
-            <p>We do not sell your personal information. We may share your information with:</p>
-            <ul>
-              <li>Service providers</li>
-              <li>Legal authorities when required</li>
-              <li>Business partners with your consent</li>
-            </ul>
+                <h3 className="text-xl font-medium mt-4">Information Automatically Collected</h3>
+                <p>Our game automatically collects:</p>
+                <ul className="list-disc pl-6">
+                  <li>Device information (what you're playing on)</li>
+                  <li>IP address (where you're getting roasted from)</li>
+                  <li>Browser type (how you're viewing our witty remarks)</li>
+                  <li>Game interaction data (every glorious mistake)</li>
+                  <li>Performance metrics (how badly our AI is beating you)</li>
+                </ul>
+              </div>
 
-            <h2>4. Your Rights</h2>
-            <p>You have the right to:</p>
-            <ul>
-              <li>Access your personal information</li>
-              <li>Correct inaccurate data</li>
-              <li>Request deletion of your data</li>
-              <li>Opt-out of marketing communications</li>
-            </ul>
+              <div>
+                <h2 className="text-2xl font-semibold">1.3. How We Use Your Information</h2>
+                <h3 className="text-xl font-medium mt-4">Primary Uses</h3>
+                <p>We use your information to:</p>
+                <ul className="list-disc pl-6">
+                  <li>Maintain your game account</li>
+                  <li>Track your progress (or lack thereof)</li>
+                  <li>Generate personalized sarcastic comments</li>
+                  <li>Improve our AI's wit and wisdom</li>
+                  <li>Keep the leaderboards accurate and humbling</li>
+                </ul>
+
+                <h3 className="text-xl font-medium mt-4">Game Improvement</h3>
+                <p>Your data helps us:</p>
+                <ul className="list-disc pl-6">
+                  <li>Develop new ways to challenge you</li>
+                  <li>Create more sophisticated mockery</li>
+                  <li>Enhance game features</li>
+                  <li>Fix bugs (yes, they exist, even in perfection)</li>
+                </ul>
+              </div>
+
+              <div>
+                <h2 className="text-2xl font-semibold">1.4. Data Storage and Security</h2>
+                <p>We store your data securely in our Supabase database. While our AI may be ruthless with its jokes, we're serious about protecting your information. We use industry-standard encryption and security measures to keep your data safe from everyone except our sarcastic AI.</p>
+              </div>
+
+              <div>
+                <h2 className="text-2xl font-semibold">1.5. Data Sharing</h2>
+                <h3 className="text-xl font-medium mt-4">Who We Share With</h3>
+                <p>We share your data with:</p>
+                <ul className="list-disc pl-6">
+                  <li>Our game servers (they need to know who to taunt)</li>
+                  <li>Authorized team members (who are sworn to secrecy)</li>
+                  <li>Other players (just your game stats, for competitive humiliation)</li>
+                </ul>
+
+                <h3 className="text-xl font-medium mt-4">What We Don't Share</h3>
+                <p>We never share:</p>
+                <ul className="list-disc pl-6">
+                  <li>Your email address</li>
+                  <li>Personal information</li>
+                  <li>Payment details</li>
+                  <li>Your embarrassing guess history</li>
+                </ul>
+              </div>
+
+              <div>
+                <h2 className="text-2xl font-semibold">1.6. Your Rights</h2>
+                <p>You have the right to:</p>
+                <ul className="list-disc pl-6">
+                  <li>Access your data (see your defeat statistics)</li>
+                  <li>Correct your information (though not your wrong guesses)</li>
+                  <li>Delete your account (rage-quitting is tracked too)</li>
+                  <li>Export your data (if you want proof of your adventures)</li>
+                  <li>Lodge complaints (about the AI's attitude, but it won't help)</li>
+                </ul>
+              </div>
+
+              <div>
+                <h2 className="text-2xl font-semibold">1.7. Cookie Policy</h2>
+                <p>We use cookies to:</p>
+                <ul className="list-disc pl-6">
+                  <li>Remember your preferences</li>
+                  <li>Keep you logged in</li>
+                  <li>Track game progress</li>
+                  <li>Store local game data</li>
+                  <li>Count how many times you've rage-quit</li>
+                </ul>
+              </div>
+
+              <div>
+                <h2 className="text-2xl font-semibold">1.8. Children's Privacy</h2>
+                <p>Snarky Hangman is suitable for players aged 13 and up. We do not knowingly collect data from players under 13. If our AI seems too harsh, maybe wait a few years.</p>
+              </div>
+
+              <div>
+                <h2 className="text-2xl font-semibold">1.9. Changes to Privacy Policy</h2>
+                <p>We may update this policy occasionally. We'll notify you of significant changes through:</p>
+                <ul className="list-disc pl-6">
+                  <li>In-game notifications</li>
+                  <li>Email updates</li>
+                  <li>A specially crafted sarcastic message</li>
+                </ul>
+              </div>
+
+              <div>
+                <h2 className="text-2xl font-semibold">1.10. Contact Information</h2>
+                <p>For privacy-related questions, contact us at:</p>
+                <ul className="list-disc pl-6">
+                  <li>Email: games@snarkyhangman.com</li>
+                  <li>Address: MinaZiggy Co LLC<br />16192 Coastal Highway<br />Lewes, Delaware<br />USA, 19958</li>
+                  <li>Support: Available through our website</li>
+                </ul>
+              </div>
+
+              <div>
+                <h2 className="text-2xl font-semibold">1.11. Legal Compliance</h2>
+                <p>This policy complies with:</p>
+                <ul className="list-disc pl-6">
+                  <li>GDPR requirements</li>
+                  <li>CCPA regulations</li>
+                  <li>Local data protection laws</li>
+                  <li>Common sense (mostly)</li>
+                </ul>
+              </div>
+
+              <div>
+                <h2 className="text-2xl font-semibold">1.12. Data Retention</h2>
+                <p>We retain your data for:</p>
+                <ul className="list-disc pl-6">
+                  <li>Account information: Until account deletion</li>
+                  <li>Game statistics: Indefinitely (your defeats are eternal)</li>
+                  <li>Chat logs: 30 days</li>
+                  <li>Performance data: 90 days</li>
+                </ul>
+              </div>
+
+              <div>
+                <h2 className="text-2xl font-semibold">1.13. Notification of Breaches</h2>
+                <p>In the unlikely event of a data breach, we will:</p>
+                <ul className="list-disc pl-6">
+                  <li>Notify affected users promptly</li>
+                  <li>Provide details of compromised data</li>
+                  <li>Outline steps taken to resolve the issue</li>
+                  <li>Have our AI prepare a particularly apologetic set of jokes</li>
+                </ul>
+              </div>
+
+              <p className="mt-8 text-sm italic">Remember, while our AI may mock your word-guessing abilities, we take your privacy very seriously. This policy ensures you understand how we handle your information while you enjoy being outwitted by our artificially intelligent companion.</p>
+            </section>
           </div>
         </div>
       </div>
