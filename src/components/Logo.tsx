@@ -59,7 +59,7 @@ export const Logo = ({ className, variant = "dark" }: LogoProps) => {
           strokeLinecap="round"
         />
       </svg>
-      <div className="flex items-center">
+      <div className="flex items-center" style={{ width: "180px" }}>
         <span 
           className={cn(
             "text-xl font-black tracking-wide transform rotate-[15deg] translate-y-1 -translate-x-1",
