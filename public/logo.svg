@@ -1,13 +1,13 @@
 
 <svg
-  width="250"
-  height="32"
-  viewBox="0 0 250 32"
+  width="180"
+  height="24"
+  viewBox="0 0 180 24"
   fill="none"
   xmlns="http://www.w3.org/2000/svg"
 >
   {/* Icon part */}
-  <g transform="translate(0, 0)">
+  <g transform="translate(0, 0) scale(0.75)">
     <path
       d="M8 6C8 4.89543 8.89543 4 10 4H12C13.1046 4 14 4.89543 14 6V26C14 27.1046 13.1046 28 12 28H10C8.89543 28 8 27.1046 8 26V6Z"
       fill="#1A1F2C"
@@ -37,12 +37,12 @@
   </g>
   
   {/* Text part */}
-  <g transform="translate(40, 0)">
+  <g transform="translate(32, 0)">
     <text
       x="0"
-      y="24"
+      y="18"
       font-family="'Permanent Marker', cursive"
-      font-size="24"
+      font-size="18"
       fill="#9b87f5"
       transform="rotate(15)"
       style="text-shadow: 1px 1px 0 #1A1F2C;"
@@ -50,10 +50,10 @@
       Snarky
     </text>
     <text
-      x="90"
-      y="24"
+      x="70"
+      y="18"
       font-family="Poppins, sans-serif"
-      font-size="24"
+      font-size="18"
       font-weight="600"
       fill="#1A1F2C"
     >
