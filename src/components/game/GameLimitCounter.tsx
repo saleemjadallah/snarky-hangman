@@ -1,8 +1,11 @@
+
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Clock, Gamepad2 } from "lucide-react";
+import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
 
 interface GameLimitState {
   gamesPlayed: number;
@@ -33,6 +36,8 @@ export const GameLimitCounter = () => {
       console.error('Error fetching game limit:', error);
       return;
     }
+
+    console.log('Fetched game limit data:', data);
 
     setLimitState({
       gamesPlayed: data.daily_games_played || 0,
@@ -70,23 +75,35 @@ export const GameLimitCounter = () => {
           table: 'profiles',
           filter: `id=eq.${user?.id}`
         },
-        (payload) => {
-          setLimitState({
-            gamesPlayed: payload.new.daily_games_played || 0,
-            gamesLimit: payload.new.daily_games_limit || 10,
-            nextReset: payload.new.next_reset_time ? new Date(payload.new.next_reset_time) : null
-          });
+        (payload: RealtimePostgresChangesPayload<{
+          daily_games_played: number;
+          daily_games_limit: number;
+          next_reset_time: string | null;
+        }>) => {
+          console.log('Received profile update:', payload);
+          
+          if (payload.new) {
+            setLimitState({
+              gamesPlayed: payload.new.daily_games_played || 0,
+              gamesLimit: payload.new.daily_games_limit || 10,
+              nextReset: payload.new.next_reset_time ? new Date(payload.new.next_reset_time) : null
+            });
+          }
         }
       )
       .subscribe();
 
+    // Refresh game limit every minute
+    const refreshInterval = setInterval(fetchGameLimit, 60000);
+
     return () => {
       supabase.removeChannel(channel);
+      clearInterval(refreshInterval);
     };
   }, [user]);
 
   useEffect(() => {
-    const timer = setInterval(updateTimeUntilReset, 60000); // Update every minute
+    const timer = setInterval(updateTimeUntilReset, 60000);
     updateTimeUntilReset();
     return () => clearInterval(timer);
   }, [limitState.nextReset]);
