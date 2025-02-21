@@ -67,6 +67,7 @@ const DifficultyCard = ({
         font-poppins rounded-2xl
         border-2 transition-all duration-300
         hover:shadow-xl hover:-translate-y-1
+        cursor-pointer
         ${borderColor}
       `}
       asChild
