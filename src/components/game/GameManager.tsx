@@ -93,6 +93,11 @@ export const GameManager = () => {
     }
   };
 
+  const handleChangeDifficulty = () => {
+    setDifficulty(null);
+    setCurrentWord(null);
+  };
+
   if (!canPlayMore && user) {
     return (
       <div className="flex flex-col items-center justify-center gap-4 p-8 text-center">
@@ -117,15 +122,18 @@ export const GameManager = () => {
         <GameControls
           isLoading={isLoading}
           onPlayAgain={handlePlayAgain}
-          onChangeDifficulty={() => setDifficulty(null)}
+          onChangeDifficulty={handleChangeDifficulty}
         />
       )}
 
-      {currentWord && (
+      {currentWord && difficulty && (
         <GameBoard
           currentWord={currentWord}
           difficulty={difficulty}
           onGameEnd={handleGameEnd}
+          onPlayAgain={handlePlayAgain}
+          onChangeDifficulty={handleChangeDifficulty}
+          isLoading={isLoading}
         />
       )}
     </>
