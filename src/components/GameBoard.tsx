@@ -9,14 +9,25 @@ import { LetterGrid } from "./game/LetterGrid";
 import { HintSystem } from "./game/HintSystem";
 import { Timer } from "./game/Timer";
 import { calculateScore, getMaxTimeForDifficulty } from "@/utils/scoring";
+import { GameControls } from "./game/GameControls";
 
 interface GameBoardProps {
   currentWord: Word;
   difficulty: Difficulty;
   onGameEnd: (won: boolean, score: number) => void;
+  onPlayAgain: () => void;
+  onChangeDifficulty: () => void;
+  isLoading?: boolean;
 }
 
-export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps) => {
+export const GameBoard = ({ 
+  currentWord, 
+  difficulty, 
+  onGameEnd,
+  onPlayAgain,
+  onChangeDifficulty,
+  isLoading = false
+}: GameBoardProps) => {
   const [guessedLetters, setGuessedLetters] = useState<string[]>([]);
   const [remainingGuesses, setRemainingGuesses] = useState(difficultySettings[difficulty].maxGuesses);
   const [message, setMessage] = useState("");
@@ -111,6 +122,14 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
     setTimeRemaining(prev => Math.min(prev + 5, getMaxTimeForDifficulty(difficulty)));
   };
 
+  const gameStats = isGameFinished && gameWon ? {
+    word,
+    score: calculateScore(guessedLetters, word, difficulty, hintsUsed, timeRemaining),
+    difficulty,
+    timeRemaining,
+    hintsUsed
+  } : undefined;
+
   return (
     <div className="w-full max-w-2xl mx-auto p-6 glass rounded-xl space-y-8">
       <Timer
@@ -149,6 +168,16 @@ export const GameBoard = ({ currentWord, difficulty, onGameEnd }: GameBoardProps
         isGameOver={isGameOver}
         onGuess={handleGuess}
       />
+
+      {isGameFinished && (
+        <GameControls
+          isLoading={isLoading}
+          onPlayAgain={onPlayAgain}
+          onChangeDifficulty={onChangeDifficulty}
+          showChallenge={gameWon}
+          gameStats={gameStats}
+        />
+      )}
 
       <Avatar
         wrongGuesses={wrongGuesses}
