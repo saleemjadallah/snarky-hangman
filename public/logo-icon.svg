@@ -6,40 +6,49 @@
   fill="none"
   xmlns="http://www.w3.org/2000/svg"
 >
+  {/* Left vertical bar of H */}
   <path
-    d="M45 30 
-       C45 25 50 20 55 20
-       H70 
-       C75 20 80 25 80 30
-       V150
-       C80 155 75 160 70 160
-       H55
-       C50 160 45 155 45 150
-       V30Z"
+    d="M20 20
+       C20 20 40 20 40 40
+       V140
+       C40 160 20 160 20 160
+       C20 160 40 160 40 140
+       V40
+       C40 20 20 20 20 20Z"
     fill="#1A1F2C"
   />
+  
+  {/* Right vertical bar of H */}
   <path
-    d="M100 30
-       C100 25 105 20 110 20
-       H125
-       C130 20 135 25 135 30
-       V150
-       C130 155 125 160 120 160
-       H105
-       C100 160 95 155 95 150
-       V30Z"
+    d="M140 20
+       C140 20 160 20 160 40
+       V140
+       C160 160 140 160 140 160
+       C140 160 160 160 160 140
+       V40
+       C160 20 140 20 140 20Z"
     fill="#1A1F2C"
   />
-  <!-- Noose rope -->
+  
+  {/* Horizontal bar of H */}
   <path
-    d="M135 30
-       C135 30 140 30 145 30
-       S160 35 165 45
-       S170 65 165 75
-       S155 85 150 85
-       S140 80 135 75"
+    d="M40 80
+       L160 80"
     stroke="#1A1F2C"
-    strokeWidth="10"
+    strokeWidth="40"
+    strokeLinecap="round"
+  />
+  
+  {/* Noose rope */}
+  <path
+    d="M160 40
+       C160 40 165 40 170 45
+       C175 50 180 60 180 70
+       C180 80 175 90 165 95
+       C155 100 145 95 140 90
+       C135 85 135 80 135 75"
+    stroke="#1A1F2C"
+    strokeWidth="8"
     fill="none"
     strokeLinecap="round"
   />
