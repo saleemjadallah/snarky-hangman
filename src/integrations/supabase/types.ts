@@ -163,10 +163,13 @@ export type Database = {
           best_score: number | null
           created_at: string | null
           current_streak: number | null
+          daily_games_limit: number | null
+          daily_games_played: number | null
           daily_score: number | null
           easy_games_played: number | null
           email: string
           favorite_difficulty: string | null
+          first_game_time: string | null
           hard_games_played: number | null
           hints_used: number | null
           id: string
@@ -174,6 +177,7 @@ export type Database = {
           last_streak_update: string | null
           longest_streak: number | null
           medium_games_played: number | null
+          next_reset_time: string | null
           perfect_games: number | null
           total_score: number | null
           updated_at: string | null
@@ -184,10 +188,13 @@ export type Database = {
           best_score?: number | null
           created_at?: string | null
           current_streak?: number | null
+          daily_games_limit?: number | null
+          daily_games_played?: number | null
           daily_score?: number | null
           easy_games_played?: number | null
           email: string
           favorite_difficulty?: string | null
+          first_game_time?: string | null
           hard_games_played?: number | null
           hints_used?: number | null
           id: string
@@ -195,6 +202,7 @@ export type Database = {
           last_streak_update?: string | null
           longest_streak?: number | null
           medium_games_played?: number | null
+          next_reset_time?: string | null
           perfect_games?: number | null
           total_score?: number | null
           updated_at?: string | null
@@ -205,10 +213,13 @@ export type Database = {
           best_score?: number | null
           created_at?: string | null
           current_streak?: number | null
+          daily_games_limit?: number | null
+          daily_games_played?: number | null
           daily_score?: number | null
           easy_games_played?: number | null
           email?: string
           favorite_difficulty?: string | null
+          first_game_time?: string | null
           hard_games_played?: number | null
           hints_used?: number | null
           id?: string
@@ -216,6 +227,7 @@ export type Database = {
           last_streak_update?: string | null
           longest_streak?: number | null
           medium_games_played?: number | null
+          next_reset_time?: string | null
           perfect_games?: number | null
           total_score?: number | null
           updated_at?: string | null
@@ -330,6 +342,10 @@ export type Database = {
         Returns: Json
       }
       maintain_word_pools: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      reset_daily_games: {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }

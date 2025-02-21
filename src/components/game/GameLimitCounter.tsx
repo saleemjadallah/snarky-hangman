@@ -1,9 +1,8 @@
-
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Clock, Gaming } from "lucide-react";
+import { Clock, Gamepad2 } from "lucide-react";
 
 interface GameLimitState {
   gamesPlayed: number;
@@ -28,9 +27,9 @@ export const GameLimitCounter = () => {
       .from('profiles')
       .select('daily_games_played, daily_games_limit, next_reset_time')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
 
-    if (error) {
+    if (error || !data) {
       console.error('Error fetching game limit:', error);
       return;
     }
@@ -61,7 +60,6 @@ export const GameLimitCounter = () => {
   useEffect(() => {
     fetchGameLimit();
     
-    // Subscribe to realtime updates
     const channel = supabase
       .channel('profile-game-limits')
       .on(
@@ -130,7 +128,7 @@ export const GameLimitCounter = () => {
     <div className="flex items-center gap-2 px-3 py-2 bg-white/80 backdrop-blur-sm rounded-lg shadow-sm">
       <div className="flex flex-col items-center">
         <div className="flex items-center gap-2">
-          <Gaming className="w-4 h-4 text-foreground/60" />
+          <Gamepad2 className="w-4 h-4 text-foreground/60" />
           <span className="text-sm font-medium">
             {remaining} / {limitState.gamesLimit} games left
           </span>

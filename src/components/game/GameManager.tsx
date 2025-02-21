@@ -46,9 +46,9 @@ export const GameManager = () => {
       .from('profiles')
       .select('daily_games_played, daily_games_limit')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
 
-    if (error) {
+    if (error || !data) {
       console.error('Error checking game limit:', error);
       return true;
     }
