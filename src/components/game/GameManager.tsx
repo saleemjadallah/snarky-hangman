@@ -33,8 +33,8 @@ export const GameManager = () => {
     difficulty,
     currentWord,
     onGameCompleted: () => {
-      setCurrentWord(null);
-      setDifficulty(null);
+      // Don't reset immediately - let the GameBoard handle this through its controls
+      console.log("Game completed and stats updated");
     },
     onUpdateScore: (gameScore) => setScore(prev => prev + gameScore)
   });
