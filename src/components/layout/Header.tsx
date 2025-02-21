@@ -2,6 +2,7 @@
 import { Logo } from "@/components/Logo";
 import { ProfileMenu } from "@/components/ProfileMenu";
 import { Leaderboard } from "@/components/Leaderboard";
+import { GameLimitCounter } from "@/components/game/GameLimitCounter";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,6 +19,7 @@ export const Header = () => {
         </div>
 
         <div className="flex items-center gap-6">
+          {user && <GameLimitCounter />}
           <div className="relative flex items-center">
             <Leaderboard />
           </div>
