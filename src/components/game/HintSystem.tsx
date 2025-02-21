@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Lightbulb, LightbulbOff } from "lucide-react";
 import {
@@ -32,15 +32,22 @@ export const HintSystem = ({
   guessedLetters,
   onHintUsed 
 }: HintSystemProps) => {
-  const [hintsRemaining, setHintsRemaining] = useState(() => {
-    switch (difficulty) {
-      case "easy": return 3;
-      case "medium": return 2;
-      case "hard": return 1;
-    }
-  });
+  const [hintsRemaining, setHintsRemaining] = useState<number>(0);
   const [usedHintTypes, setUsedHintTypes] = useState<Set<string>>(new Set());
   const { toast } = useToast();
+
+  // Reset hints when word changes or difficulty changes
+  useEffect(() => {
+    const initialHints = (() => {
+      switch (difficulty) {
+        case "easy": return 3;
+        case "medium": return 2;
+        case "hard": return 1;
+      }
+    })();
+    setHintsRemaining(initialHints);
+    setUsedHintTypes(new Set());
+  }, [word, difficulty]);
 
   const useHint = (hintType: string) => {
     if (hintsRemaining <= 0) {
