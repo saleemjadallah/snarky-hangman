@@ -67,6 +67,13 @@ export const useGameStatsManager = ({
 
       if (profileError) throw profileError;
 
+      // Trigger a refresh event on the profiles channel
+      await supabase.channel('profile-game-limits').send({
+        type: 'broadcast',
+        event: 'game-completed',
+        payload: { user_id: user?.id }
+      });
+
       if (won) {
         onUpdateScore(gameScore);
       }

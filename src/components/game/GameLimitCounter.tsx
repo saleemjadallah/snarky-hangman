@@ -94,6 +94,16 @@ export const GameLimitCounter = () => {
           }
         }
       )
+      .on(
+        'broadcast',
+        { event: 'game-completed' },
+        ({ payload }) => {
+          console.log('Game completed event received:', payload);
+          if (payload.user_id === user?.id) {
+            fetchGameLimit();
+          }
+        }
+      )
       .subscribe();
 
     // Refresh game limit every minute
