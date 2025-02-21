@@ -13,6 +13,12 @@ interface GameLimitState {
   nextReset: Date | null;
 }
 
+type ProfileUpdate = {
+  daily_games_played: number;
+  daily_games_limit: number;
+  next_reset_time: string | null;
+}
+
 export const GameLimitCounter = () => {
   const [limitState, setLimitState] = useState<GameLimitState>({
     gamesPlayed: 0,
@@ -75,18 +81,15 @@ export const GameLimitCounter = () => {
           table: 'profiles',
           filter: `id=eq.${user?.id}`
         },
-        (payload: RealtimePostgresChangesPayload<{
-          daily_games_played: number;
-          daily_games_limit: number;
-          next_reset_time: string | null;
-        }>) => {
+        (payload: RealtimePostgresChangesPayload<Database['public']['Tables']['profiles']['Update']>) => {
           console.log('Received profile update:', payload);
           
-          if (payload.new) {
+          const newData = payload.new;
+          if (newData && typeof newData === 'object' && 'daily_games_played' in newData) {
             setLimitState({
-              gamesPlayed: payload.new.daily_games_played || 0,
-              gamesLimit: payload.new.daily_games_limit || 10,
-              nextReset: payload.new.next_reset_time ? new Date(payload.new.next_reset_time) : null
+              gamesPlayed: newData.daily_games_played ?? 0,
+              gamesLimit: newData.daily_games_limit ?? 10,
+              nextReset: newData.next_reset_time ? new Date(newData.next_reset_time) : null
             });
           }
         }
