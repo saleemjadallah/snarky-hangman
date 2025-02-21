@@ -21,21 +21,39 @@ export const ChallengeButton = ({ word, score, difficulty, timeRemaining, hintsU
 
   const handleChallenge = async () => {
     try {
+      if (!user?.id) {
+        toast({
+          title: "Not logged in",
+          description: "You need to be logged in to create challenges!",
+          variant: "destructive",
+        });
+        return;
+      }
+
       // Create challenge in database
       const { data: challenge, error } = await supabase
         .from('challenges')
         .insert({
-          creator_id: user?.id,
+          creator_id: user.id,
           word,
           difficulty,
           score,
           time_remaining: timeRemaining,
-          hints_used: hintsUsed
+          hints_used: hintsUsed,
+          status: 'active',
+          expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours from now
         } as Challenge)
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error creating challenge:', error);
+        throw new Error(error.message);
+      }
+
+      if (!challenge) {
+        throw new Error('No challenge data returned');
+      }
 
       const challengeUrl = `${window.location.origin}?challenge=${challenge.id}`;
       const message = generateChallengeMessage(word, score, timeRemaining, hintsUsed, difficulty);
@@ -59,7 +77,7 @@ export const ChallengeButton = ({ word, score, difficulty, timeRemaining, hintsU
       console.error('Error creating challenge:', error);
       toast({
         title: "Error creating challenge",
-        description: "Something went wrong. Please try again.",
+        description: error.message || "Something went wrong. Please try again.",
         variant: "destructive",
       });
     }
