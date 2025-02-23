@@ -32,14 +32,15 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
     try {
       await signUp(email, username);
       toast({
-        title: "Magic link sent!",
-        description: "Please check your email to sign in.",
+        title: "Check your email",
+        description: "We've sent you a magic link to sign in. If you don't see it, check your spam folder.",
       });
       onClose();
     } catch (error: any) {
+      console.error("Registration error:", error);
       toast({
-        title: "Error sending magic link",
-        description: error.message,
+        title: "Unable to send magic link",
+        description: "Please try again later or contact support if the problem persists.",
         variant: "destructive",
       });
     } finally {
@@ -55,14 +56,15 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
     try {
       await signIn(email);
       toast({
-        title: "Magic link sent!",
-        description: "Please check your email to sign in.",
+        title: "Check your email",
+        description: "We've sent you a magic link to sign in. If you don't see it, check your spam folder.",
       });
       onClose();
     } catch (error: any) {
+      console.error("Sign in error:", error);
       toast({
-        title: "Error sending magic link",
-        description: error.message,
+        title: "Unable to send magic link",
+        description: "Please try again later or contact support if the problem persists.",
         variant: "destructive",
       });
     } finally {

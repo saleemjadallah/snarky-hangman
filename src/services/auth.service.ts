@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Profile } from "@/types/auth";
 import { AuthResponse } from "@supabase/supabase-js";
@@ -11,27 +10,39 @@ export async function signUp(email: string, username: string): Promise<AuthRespo
         data: {
           username // Store username in user metadata
         },
-        emailRedirectTo: `${window.location.origin}/` // Ensure redirect happens to the correct URL with trailing slash
+        emailRedirectTo: window.location.origin, // Remove trailing slash
       }
     });
 
-    if (response.error) throw response.error;
+    if (response.error) {
+      console.error("Sign up error:", response.error);
+      throw response.error;
+    }
     return response;
   } catch (error: any) {
+    console.error("Sign up catch error:", error);
     throw error;
   }
 }
 
 export async function signIn(email: string): Promise<AuthResponse> {
-  const response = await supabase.auth.signInWithOtp({
-    email,
-    options: {
-      emailRedirectTo: `${window.location.origin}/` // Ensure redirect happens to the correct URL with trailing slash
-    }
-  });
+  try {
+    const response = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: window.location.origin, // Remove trailing slash
+      }
+    });
 
-  if (response.error) throw response.error;
-  return response;
+    if (response.error) {
+      console.error("Sign in error:", response.error);
+      throw response.error;
+    }
+    return response;
+  } catch (error: any) {
+    console.error("Sign in catch error:", error);
+    throw error;
+  }
 }
 
 interface DatabaseProfile {
@@ -66,7 +77,6 @@ export async function fetchProfile(userId: string): Promise<Profile | null> {
   
   if (error) throw error;
   
-  // Ensure all required fields are present with default values if needed
   if (data) {
     const dbProfile = data as DatabaseProfile;
     return {
