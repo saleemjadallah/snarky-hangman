@@ -114,7 +114,7 @@ export const GameManager = () => {
 
   return (
     <>
-      <IntroSection score={score} />
+      <IntroSection score={score} hideIntro={!!difficulty} />
 
       {!difficulty && <DifficultySelector onSelect={handleDifficultySelect} />}
 
