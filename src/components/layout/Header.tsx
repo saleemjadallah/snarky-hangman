@@ -20,6 +20,7 @@ export const Header = () => {
           </div>
 
           <div className="flex items-center gap-6">
+            {user && <div className="hidden md:block"><GameLimitCounter /></div>}
             <div className="relative flex items-center">
               <Leaderboard />
             </div>
