@@ -33,6 +33,7 @@ export const GameBoard = ({
   const [message, setMessage] = useState("");
   const [isGameFinished, setIsGameFinished] = useState(false);
   const [hintsUsed, setHintsUsed] = useState(0);
+  const [gameScore, setGameScore] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(() => {
     switch (difficulty) {
       case "easy": return 90;
@@ -54,6 +55,7 @@ export const GameBoard = ({
     setMessage("");
     setIsGameFinished(false);
     setHintsUsed(0);
+    setGameScore(0);
     setTimeRemaining(() => {
       switch (difficulty) {
         case "easy": return 90;
@@ -67,6 +69,7 @@ export const GameBoard = ({
     if (isGameOver && !isGameFinished) {
       setIsGameFinished(true);
       const score = gameWon ? calculateScore(guessedLetters, word, difficulty, hintsUsed, timeRemaining) : 0;
+      setGameScore(score);
       
       // Call onGameEnd for both win and lose conditions
       onGameEnd(gameWon, score);
@@ -131,13 +134,20 @@ export const GameBoard = ({
 
   return (
     <div className="w-full max-w-2xl mx-auto p-6 glass rounded-xl space-y-8">
-      <Timer
-        timeRemaining={timeRemaining}
-        isGameFinished={isGameFinished}
-        isGameOver={isGameOver}
-        onTimeUpdate={setTimeRemaining}
-        difficulty={difficulty}
-      />
+      <div className="flex justify-between items-center">
+        <Timer
+          timeRemaining={timeRemaining}
+          isGameFinished={isGameFinished}
+          isGameOver={isGameOver}
+          onTimeUpdate={setTimeRemaining}
+          difficulty={difficulty}
+        />
+        {isGameFinished && gameWon && (
+          <div className="text-lg font-bold text-primary">
+            Score: {gameScore}
+          </div>
+        )}
+      </div>
 
       <WordDisplay
         word={word}
