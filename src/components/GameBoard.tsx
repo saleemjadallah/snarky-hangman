@@ -68,9 +68,8 @@ export const GameBoard = ({
       setIsGameFinished(true);
       const score = gameWon ? calculateScore(guessedLetters, word, difficulty, hintsUsed, timeRemaining) : 0;
       
-      setTimeout(() => {
-        onGameEnd(gameWon, score);
-      }, 2000);
+      // Call onGameEnd for both win and lose conditions
+      onGameEnd(gameWon, score);
     }
   }, [isGameOver, isGameFinished]);
 
