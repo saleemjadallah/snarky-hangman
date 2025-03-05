@@ -1,3 +1,5 @@
 
-# This file is redirected via .htaccess to:
-# https://srv.adstxtmanager.com/19390/snarkyhangman.com
+<?php
+header('Location: https://srv.adstxtmanager.com/19390/snarkyhangman.com');
+exit;
+?>
