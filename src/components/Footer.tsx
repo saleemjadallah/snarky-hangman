@@ -11,16 +11,12 @@ export function Footer() {
             <Link 
               to="/privacy-policy"
               className="hover:text-primary hover:underline transition-colors duration-200"
-              target="_blank"
-              rel="noopener noreferrer"
             >
               Privacy Policy
             </Link>
             <Link 
               to="/terms-conditions"
               className="hover:text-primary hover:underline transition-colors duration-200"
-              target="_blank"
-              rel="noopener noreferrer"
             >
               Terms & Conditions
             </Link>
