@@ -17,18 +17,18 @@ export default function PrivacyPolicy() {
         <div className="space-y-8 text-foreground">
           <div className="space-y-4">
             <h1 className="text-4xl font-bold">Privacy Policy for Snarky Hangman</h1>
-            <p className="text-sm text-muted-foreground">Last updated: February 20, 2025</p>
+            <p className="text-sm text-muted-foreground">Last Updated: February 20, 2025</p>
           </div>
 
           <div className="prose prose-gray max-w-none">
             <section className="space-y-6">
               <div>
-                <h2 className="text-2xl font-semibold">1.1. Introduction</h2>
+                <h2 className="text-2xl font-semibold">Introduction</h2>
                 <p>Welcome to Snarky Hangman's Privacy Policy. Yes, even a game about guessing words needs one of these. We at MinaZiggy Co LLC take your privacy seriously (even if our AI doesn't take much else seriously).</p>
               </div>
 
               <div>
-                <h2 className="text-2xl font-semibold">1.2. Information We Collect</h2>
+                <h2 className="text-2xl font-semibold">Information We Collect</h2>
                 <h3 className="text-xl font-medium mt-4">Information You Give Us</h3>
                 <p>We collect the following information when you play Snarky Hangman:</p>
                 <ul className="list-disc pl-6">
@@ -50,7 +50,7 @@ export default function PrivacyPolicy() {
               </div>
 
               <div>
-                <h2 className="text-2xl font-semibold">1.3. How We Use Your Information</h2>
+                <h2 className="text-2xl font-semibold">How We Use Your Information</h2>
                 <h3 className="text-xl font-medium mt-4">Primary Uses</h3>
                 <p>We use your information to:</p>
                 <ul className="list-disc pl-6">
@@ -72,12 +72,12 @@ export default function PrivacyPolicy() {
               </div>
 
               <div>
-                <h2 className="text-2xl font-semibold">1.4. Data Storage and Security</h2>
+                <h2 className="text-2xl font-semibold">Data Storage and Security</h2>
                 <p>We store your data securely in our Supabase database. While our AI may be ruthless with its jokes, we're serious about protecting your information. We use industry-standard encryption and security measures to keep your data safe from everyone except our sarcastic AI.</p>
               </div>
 
               <div>
-                <h2 className="text-2xl font-semibold">1.5. Data Sharing</h2>
+                <h2 className="text-2xl font-semibold">Data Sharing</h2>
                 <h3 className="text-xl font-medium mt-4">Who We Share With</h3>
                 <p>We share your data with:</p>
                 <ul className="list-disc pl-6">
@@ -97,7 +97,7 @@ export default function PrivacyPolicy() {
               </div>
 
               <div>
-                <h2 className="text-2xl font-semibold">1.6. Your Rights</h2>
+                <h2 className="text-2xl font-semibold">Your Rights</h2>
                 <p>You have the right to:</p>
                 <ul className="list-disc pl-6">
                   <li>Access your data (see your defeat statistics)</li>
@@ -109,7 +109,7 @@ export default function PrivacyPolicy() {
               </div>
 
               <div>
-                <h2 className="text-2xl font-semibold">1.7. Cookie Policy</h2>
+                <h2 className="text-2xl font-semibold">Cookie Policy</h2>
                 <p>We use cookies to:</p>
                 <ul className="list-disc pl-6">
                   <li>Remember your preferences</li>
@@ -121,12 +121,12 @@ export default function PrivacyPolicy() {
               </div>
 
               <div>
-                <h2 className="text-2xl font-semibold">1.8. Children's Privacy</h2>
+                <h2 className="text-2xl font-semibold">Children's Privacy</h2>
                 <p>Snarky Hangman is suitable for players aged 13 and up. We do not knowingly collect data from players under 13. If our AI seems too harsh, maybe wait a few years.</p>
               </div>
 
               <div>
-                <h2 className="text-2xl font-semibold">1.9. Changes to Privacy Policy</h2>
+                <h2 className="text-2xl font-semibold">Changes to Privacy Policy</h2>
                 <p>We may update this policy occasionally. We'll notify you of significant changes through:</p>
                 <ul className="list-disc pl-6">
                   <li>In-game notifications</li>
@@ -136,17 +136,17 @@ export default function PrivacyPolicy() {
               </div>
 
               <div>
-                <h2 className="text-2xl font-semibold">1.10. Contact Information</h2>
+                <h2 className="text-2xl font-semibold">Contact Information</h2>
                 <p>For privacy-related questions, contact us at:</p>
                 <ul className="list-disc pl-6">
-                  <li>Email: games@snarkyhangman.com</li>
-                  <li>Address: MinaZiggy Co LLC<br />16192 Coastal Highway<br />Lewes, Delaware<br />USA, 19958</li>
+                  <li>Email: game@snarkyhangman.com</li>
+                  <li>Address: MinaZiggy Co LLC Headquarters</li>
                   <li>Support: Available through our website</li>
                 </ul>
               </div>
 
               <div>
-                <h2 className="text-2xl font-semibold">1.11. Legal Compliance</h2>
+                <h2 className="text-2xl font-semibold">Legal Compliance</h2>
                 <p>This policy complies with:</p>
                 <ul className="list-disc pl-6">
                   <li>GDPR requirements</li>
@@ -157,7 +157,7 @@ export default function PrivacyPolicy() {
               </div>
 
               <div>
-                <h2 className="text-2xl font-semibold">1.12. Data Retention</h2>
+                <h2 className="text-2xl font-semibold">Data Retention</h2>
                 <p>We retain your data for:</p>
                 <ul className="list-disc pl-6">
                   <li>Account information: Until account deletion</li>
@@ -168,7 +168,7 @@ export default function PrivacyPolicy() {
               </div>
 
               <div>
-                <h2 className="text-2xl font-semibold">1.13. Notification of Breaches</h2>
+                <h2 className="text-2xl font-semibold">Notification of Breaches</h2>
                 <p>In the unlikely event of a data breach, we will:</p>
                 <ul className="list-disc pl-6">
                   <li>Notify affected users promptly</li>
