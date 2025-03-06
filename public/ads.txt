@@ -1,5 +1,5 @@
 
 <?php
-header('Location: https://srv.adstxtmanager.com/19390/snarkyhangman.com');
+header('Location: https://srv.adstxtmanager.com/19390/snarkyhangman.app');
 exit;
 ?>
