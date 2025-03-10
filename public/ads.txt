@@ -1,5 +1,2 @@
 
-<?php
-header('Location: https://srv.adstxtmanager.com/19390/snarkyhangman.app');
-exit;
-?>
+google.com, pub-7290778754797407, DIRECT, f08c47fec0942fa0
