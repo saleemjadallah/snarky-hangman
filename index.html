@@ -7,59 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Snarky Hangman - The word game that mocks your every move!" />
     <title>Snarky Hangman</title>
-    <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7290778754797407"
-     crossorigin="anonymous"></script>
-    <!-- Ad Manager Script -->
-    <script async src="https://js.wpadmngr.com/static/adManager.js" data-admpid="305011"></script>
   </head>
-  <script src="https://kulroakonsu.net/88/tag.min.js" data-zone="136526" async data-cfasync="false"></script>
   <body>
-    <!-- Left banner -->
-    <div style="position: fixed; left: 0; top: 0; height: 100%; width: 160px;">
-      <div data-banner-id="305011" data-ad-zone="left"></div>
-    </div>
-    
     <div id="root"></div>
-    
-    <!-- Right banner -->
-    <div style="position: fixed; right: 0; top: 0; height: 100%; width: 160px;">
-      <div data-banner-id="305011" data-ad-zone="right"></div>
-    </div>
-    
-    <!-- Additional ad placeholders in different formats -->
-    <div style="display: none;">
-      <div data-banner-id="305011" data-ad-format="vertical"></div>
-      <div data-banner-id="305011" data-ad-format="horizontal"></div>
-      <div data-banner-id="305011"></div>
-    </div>
     
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
-    
-    <!-- Register service workers -->
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-          // Register first service worker
-          navigator.serviceWorker.register('/sw.js', { scope: '/' })
-            .then(registration => {
-              console.log('First ServiceWorker registration successful with scope: ', registration.scope);
-            })
-            .catch(error => {
-              console.log('First ServiceWorker registration failed: ', error);
-            });
-          
-          // Register second service worker - using a different scope to prevent conflicts
-          navigator.serviceWorker.register('/sw2.js', { scope: '/sw2/' })
-            .then(registration => {
-              console.log('Second ServiceWorker registration successful with scope: ', registration.scope);
-            })
-            .catch(error => {
-              console.log('Second ServiceWorker registration failed: ', error);
-            });
-        });
-      }
-    </script>
   </body>
 </html>
