@@ -36,16 +36,26 @@
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
     
-    <!-- Register service worker -->
+    <!-- Register service workers -->
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {
+          // Register first service worker
           navigator.serviceWorker.register('/sw.js', { scope: '/' })
             .then(registration => {
-              console.log('ServiceWorker registration successful with scope: ', registration.scope);
+              console.log('First ServiceWorker registration successful with scope: ', registration.scope);
             })
             .catch(error => {
-              console.log('ServiceWorker registration failed: ', error);
+              console.log('First ServiceWorker registration failed: ', error);
+            });
+          
+          // Register second service worker - using a different scope to prevent conflicts
+          navigator.serviceWorker.register('/sw2.js', { scope: '/sw2/' })
+            .then(registration => {
+              console.log('Second ServiceWorker registration successful with scope: ', registration.scope);
+            })
+            .catch(error => {
+              console.log('Second ServiceWorker registration failed: ', error);
             });
         });
       }
