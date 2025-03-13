@@ -24,12 +24,14 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Router>
         <AuthProvider>
-          <div className="min-h-screen flex flex-col">
-            {/* Ad banner container - left side */}
-            <div className="fixed left-0 top-0 bottom-0 w-[160px] hidden lg:block">
-              <div data-banner-id="305011"></div>
+          {/* Ad banner container - left side */}
+          <div className="fixed left-0 top-0 bottom-0 w-[160px] hidden lg:block z-[60]">
+            <div className="h-full flex items-center justify-center pt-[100px]">
+              <div data-banner-id="305011" data-ad-format="vertical"></div>
             </div>
-            
+          </div>
+          
+          <div className="min-h-screen flex flex-col">
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
@@ -38,10 +40,12 @@ function App() {
             </Routes>
             <Footer />
             <Toaster />
-            
-            {/* Ad banner container - right side */}
-            <div className="fixed right-0 top-0 bottom-0 w-[160px] hidden lg:block">
-              <div data-banner-id="305011"></div>
+          </div>
+          
+          {/* Ad banner container - right side */}
+          <div className="fixed right-0 top-0 bottom-0 w-[160px] hidden lg:block z-[60]">
+            <div className="h-full flex items-center justify-center pt-[100px]">
+              <div data-banner-id="305011" data-ad-format="vertical"></div>
             </div>
           </div>
         </AuthProvider>
