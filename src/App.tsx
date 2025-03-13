@@ -25,6 +25,11 @@ function App() {
       <Router>
         <AuthProvider>
           <div className="min-h-screen flex flex-col">
+            {/* Ad banner container - left side */}
+            <div className="fixed left-0 top-0 bottom-0 w-[160px] hidden lg:block">
+              <div data-banner-id="305011"></div>
+            </div>
+            
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
@@ -33,6 +38,11 @@ function App() {
             </Routes>
             <Footer />
             <Toaster />
+            
+            {/* Ad banner container - right side */}
+            <div className="fixed right-0 top-0 bottom-0 w-[160px] hidden lg:block">
+              <div data-banner-id="305011"></div>
+            </div>
           </div>
         </AuthProvider>
       </Router>
