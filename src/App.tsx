@@ -24,13 +24,6 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Router>
         <AuthProvider>
-          {/* Ad banner container - left side */}
-          <div className="fixed left-0 top-0 bottom-0 w-[160px] hidden lg:block z-[60]">
-            <div className="h-full flex items-center justify-center pt-[100px]">
-              <div data-banner-id="305011" data-ad-format="vertical"></div>
-            </div>
-          </div>
-          
           <div className="min-h-screen flex flex-col">
             <Routes>
               <Route path="/" element={<Index />} />
@@ -40,13 +33,6 @@ function App() {
             </Routes>
             <Footer />
             <Toaster />
-          </div>
-          
-          {/* Ad banner container - right side */}
-          <div className="fixed right-0 top-0 bottom-0 w-[160px] hidden lg:block z-[60]">
-            <div className="h-full flex items-center justify-center pt-[100px]">
-              <div data-banner-id="305011" data-ad-format="vertical"></div>
-            </div>
           </div>
         </AuthProvider>
       </Router>
